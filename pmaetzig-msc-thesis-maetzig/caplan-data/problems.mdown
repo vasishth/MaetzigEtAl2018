@@ -1,0 +1,19 @@
+# Problems in Caplan et al. (2015)
+
+## 1. Calculation of response accuracies
+
+* The calculation of response accuracies in Caplan et al. (2015) provides only one point value for each sentence.
+* Response accuracies were calculated for a sentence picture matching task. 
+* For some constructions (SR/OR-PRO, SR/OR-REF) this calculation is not well-defined. 
+
+### Example: SR-REF (pictures provided in caplan\_example\_pictures.pdf)
+
+* *The woman who hugged the girl washed herself.*
+* Two dependencies:
+    * the woman hugged the girl
+    * the girl washed herself (girl is antecedent of herself)
+* What Caplan et al. (2015) did: provide two different sets of pictures, check one dependency in half of the trials, and one in the other half.
+* Problem: For all the sentences, we don't know for which of the two dependencies (or possibly for both) the subject showed problems, if the accuracy is 0.
+* This is a problem for modelling as well, because there we have to decide which of the two dependencies makes up the basis for the accuracy calculation. 
+
+## 2. Imbalance of self-paced listening times

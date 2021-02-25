@@ -1,0 +1,5 @@
+GG-EXP1 1 output/../paramsearch/GG-EXP1-20161211-2310/1-fixations.txt "(GA 0.5)"
+GG-EXP1 2 output/../paramsearch/GG-EXP1-20161211-2310/2-fixations.txt "(GA 0.75)"
+GG-EXP1 3 output/../paramsearch/GG-EXP1-20161211-2310/3-fixations.txt "(GA 1.0)"
+GG-EXP1 4 output/../paramsearch/GG-EXP1-20161211-2310/4-fixations.txt "(GA 1.25)"
+GG-EXP1 5 output/../paramsearch/GG-EXP1-20161211-2310/5-fixations.txt "(GA 1.5)"

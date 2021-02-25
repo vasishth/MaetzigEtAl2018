@@ -1,0 +1,8 @@
+GG-EXP1 1 output/../paramsearch/GG-EXP1-20161212-0243/1-fixations.txt "(DAT 0.05)"
+GG-EXP1 2 output/../paramsearch/GG-EXP1-20161212-0243/2-fixations.txt "(DAT 0.1)"
+GG-EXP1 3 output/../paramsearch/GG-EXP1-20161212-0243/3-fixations.txt "(DAT 0.05)"
+GG-EXP1 4 output/../paramsearch/GG-EXP1-20161212-0243/4-fixations.txt "(DAT 0.1)"
+GG-EXP1 5 output/../paramsearch/GG-EXP1-20161212-0243/5-fixations.txt "(DAT 0.05)"
+GG-EXP1 6 output/../paramsearch/GG-EXP1-20161212-0243/6-fixations.txt "(DAT 0.1)"
+GG-EXP1 7 output/../paramsearch/GG-EXP1-20161212-0243/7-fixations.txt "(DAT 0.05)"
+GG-EXP1 8 output/../paramsearch/GG-EXP1-20161212-0243/8-fixations.txt "(DAT 0.1)"

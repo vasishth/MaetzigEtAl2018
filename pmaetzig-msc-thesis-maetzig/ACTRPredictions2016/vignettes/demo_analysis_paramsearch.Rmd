@@ -1,0 +1,103 @@
+---
+title: "Visualising the effect of a low W parameter setting"
+author: "Paul Mätzig"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{demo paramsearch analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Intro
+
+This is a demo of the core functions of this package, as part of my master's
+thesis. I will show a minimal example of an analysis of a `run-param-search-em`
+simulation of the ACT-R model (cf. Lewis & Vasishth, 2005, Engelmann et al., 
+2013) -- for the standard setting and a low value of the $W$ parameter. This 
+is intended to model low working memory capacity, with the outlook of modelling
+aphasic sentence comprehension.
+
+## Workflow
+
+Because the output format of the fixations that the ACT-R model produces is
+fairly uniform across different sentences and experiments, this package
+exploits the `paramsearch.txt` file to automatically extract regions of
+interest and assigning paramsearch sets and parameters settings as names of the
+data frames.
+
+The way this package is intended to be used for analysis of paramsearch
+analyses is to either
+
+1) copy this vignette as an rmarkdown file into the directory within
+`paramsearch/` and follow the workflow given here, or
+2) in this same directory, write a short script yourself that calls the
+functions, using this workflow as a guide.
+
+Here, we're going to concentrate on visualising the effect of a low $W$ parameter
+setting on total fixation time (TFT). A look at `paramsearch.txt` shows that,
+additionally, a simulation with a high $W$ has been run, but we're going to
+ignore this.
+
+```{r}
+library(ACTRPredictions2016)
+library(dplyr)
+library(ggplot2)
+p <- get_parameters("../data/paramsearch.txt")
+head(p)
+```
+
+The `paramsearch.txt` file contains metadata on the simulation that was run with
+the ACT-R model. We can automatically read and correctly name all the fixation
+files in the directory specified by `path`, via the function `get_data`. The
+result is a list of data frames.
+
+```{r}
+fixation_list <- get_data("../data", p)
+summary(fixation_list)
+```
+
+To calculate reading measures from the raw fixation data, we will use `em2`
+which is wrapped in the function `calculate_reading_measures`:
+
+```{r}
+data_list <- calculate_reading_measures(fixation_list)
+head(data_list[[1]])
+```
+
+We will only look at the main and embedded verb regions, to visualise an effect.
+For now, there is the function `extract_main_emb_V` (this will be generalised
+in a later version of this package):
+
+```{r}
+data_list <- extract_main_emb_V(data_list)
+head(data_list[[1]])
+```
+
+Calculate means and standard error of the mean by region and condition:
+
+```{r}
+## This is how I did it before:
+# tapply(data_list[[1]]$TFT, INDEX=list(data_list[[1]]$condition, data_list[[1]]$roi), mean, na.rm=TRUE)
+# tapply(data_list[[1]]$TFT, INDEX=list(data_list[[1]]$condition, data_list[[1]]$roi), standard_error)
+
+# And here's how to do it with this package:
+results_list <- mean_se_by_region(data_list, measure="TFT")
+print(head(results_list[[1]]))
+print(results_list[[1]]$`mean(TFT)`)
+print(results_list[[1]]$`standard_error(TFT)`)
+```
+
+Quick test if plotting with `ggplot2::qplot` works:
+
+```{r}
+## Multiple plots next to each other not working yet. How to do that?
+## (for loop doesn't get evaluated in a chunk
+# par(mfrow=(c(1, 2)))
+plot_by_region(results_list[[2]], maintitle="Standard W parameter setting", legendpos=c(0, 0.2))
+plot_by_region(results_list[[1]], maintitle="Low W parameter setting", legendpos=c(0, 0.2))
+```

@@ -1,0 +1,36 @@
+# TODO for caplan data
+- collapse FPRT, TRT, RPD for the ACT-R output for the Caplan (gg) sentences
+- upload R code for Caplan plots to Dropbox/
+- if no error in SO/SS contrast; 
+- do  the same procedure Cleft-Subj/Obj contrasbt
+    - difference should be in seg 'd' or 'e'
+
+# for thesis
+- concentrate on parser predictions for diff. parameter settings in the following manner:
+- predictions for SO/SS contrast
+    - in standard LV05 Engelmann parser
+    - in standard LV05 parser with increased noise 
+    - in std LV05p with slowed down production rules (dat, default action time parameter)
+    - incr. noise + slowdown
+    - std LV05p with W param reduced to simulate low WMC
+    - slowdown + low WMC
+    - noise + low WMC
+    - noise + slowdown + low WMC
+
+Way to proceed:
+- develop some workflow 
+- create bitbucket repository for MSc : share with Shravan (gmail address if it works, username 'vasishth')
+
+# King ... (1991) data, SR/OR indiv. diff.ces with high/low WMC
+- possible way if Caplan data useless
+
+# Comment from Caplan (by mail)
+
+We did not regress reading times for earlier words out of reading times
+for "critical" words. We should have. Maybe the sentence type effect would
+survive the regression. This problem arose once before in project with
+normals, and it eliminated what seemed like an interesting effect at the
+disambiguating verb in "NP/S" sentences (Van Dyke and Lewis, 2003).
+
+It is great that you and your student are re-analyzig these data. We'll
+see how much changes.

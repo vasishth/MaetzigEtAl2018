@@ -1,0 +1,28 @@
+# Meeting on MSc (10/2016--...)
+
+## Data from Caplan (2015)
+
+The data that Caplan published in his 2015 paper are with Shravan. At the moment,
+there is not yet a list deciphering what the different indices mean, but for now 
+the association of 'seg' to region of interest should be easy (see script in 
+'~/.../msc\ thesis'). 
+
+Some notes on the data:
+- current data (`rcdata.txt`) is only a subset of the original data, subsetted 
+by columns and also rows (only for SR/OR constructions, so basically two
+conditions)
+- Shravan will share complete data later on (probably via dropbox)
+
+## Todo until next Friday (2016-07-22)
+- fix segments a-e to region names
+- for Caplan data, summarise SO/SS data by subject and region with CI
+- Shravan will send code (analysis for diff. data), including vignette, with 
+ready-made functions for region mean and CI calculation **see email**
+
+## ACT-R 
+- re-download ACT-R from Felix' github
+- generate reading times for subjects, generate subj mean + SE
+
+## Other notes from the meeting
+- package for reading in excel documents in R: `xlsx`, needs some weird java dependencies
+- when Shravan tried it there was a memory error during loading, research this?

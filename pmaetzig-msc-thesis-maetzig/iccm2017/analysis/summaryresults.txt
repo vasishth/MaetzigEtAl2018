@@ -1,0 +1,18 @@
+Goal activation:
+
+SRs: 
+          controls                         iwa
+          comp 1    comp 2              comp 1   comp 2
+lambda 0.1897779 0.8102221      lambda 0.359127 0.640873
+mu     0.3953706 0.9335370      mu     0.308524 0.911723
+sigma  0.0788427 0.0788427      sigma  0.125476 0.125476 <=noisier in iwa
+
+
+ORs:
+         controls 
+         comp 1   comp 2               comp 1   comp 2
+lambda 0.242545 0.757455        lambda 0.513022 0.486978
+mu     0.484971 0.930581        mu     0.318779 0.889098
+sigma  0.127528 0.127528        sigma  0.145495 0.145495
+
+

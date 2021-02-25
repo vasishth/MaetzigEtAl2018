@@ -1,0 +1,128 @@
+\documentclass{scrartcl}
+\linespread{1.25}
+
+%% References
+\usepackage{apacite}
+
+%% Mathematics
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+
+%% including pdfs as whole pages (if necessary)
+\usepackage{pdfpages}
+
+%% to-do-note management
+\usepackage{todonotes}
+
+\title{Computational modelling of sentence processing in aphasia}
+ 
+\author{Paul M\"{a}tzig}
+        
+
+\begin{document}
+
+\maketitle
+
+%\tableofcontents
+
+\section{Introduction}
+
+I'm aiming for a short, concise introduction. The actual background I will put in a
+specific literature review section.
+
+\section{Literature Review}
+
+The literature review should lay out the research that has been done in the general area
+that the thesis is concerned with. Because it is a thesis, it doesn't have to be all that
+focussed, compared to a journal paper. 
+
+\subsection{Sentence processing and aphasia}
+
+What is different in sentence comprehension in people with aphasia?
+
+\emph{PWA have difficulties processing non-canonical, semantically reversible sentences. This picture is relatively easy in English for O-S constructions, the picture is more difficult in German.}
+People with aphasia exhibit difficulties during processing of non-canonical, semantically reversible sentences. \emph{Non-canonical}, for most people in the literature\todo{references}, means ``not following the canonical word order'', without much discussion on the definition of canonical word order. For simplicity, as most research on sentence processing in aphasia has been conducted on English speaking individuals, the aphasic deficit is observable in structures like passives, object relatives, object clefts, object questions, etc.---mostly sentences where the object precedes the subject of the sentence.\todo{Funnily enough, this could correspond to predictions of the head parameter \ldots.} \ldots 
+\begin{itemize}
+  \item prospective prediction on aphasic SP in German (
+  \item 
+\end{itemize}
+
+
+
+Something on SP and aphasia in general. I should not diverge too far, an introduction to 
+the topic comparable to Patil et al.\ (2016) is enough (if not too verbose).
+
+\subsection{Individual differences in sentence processing}
+
+Here I can benefit from Bruno's PhD thesis, as it provides a good summary of the state of
+the art of that topic.
+
+\subsection{Computational models of sentence processing}
+
+blah
+
+\section{Cue-based retrieval}
+
+This is a section that discusses, on the one hand, the cue-based retrieval approaches to 
+sentence processing, so mainly the Julie van Dyke, Rick Lewis, and Shravan's stuff.
+
+Optimally, I would like to keep this section relatively short. It should still provide the
+reader with a general idea of how cue-based retrieval as a theory, and the LV05 model as its
+computational implementation, work. (objective would be, e.g., that Carla could read it and get
+the general idea behind it)
+
+\begin{itemize}
+  \item How cue-based retrieval works,
+  \item what the empirical facts are that motivate it,
+  \item why it is a theory that intuitively lends itself to being implemented computationally, and
+  \item how the LV05 model works.
+\end{itemize}
+
+In the last paragraph (this should be a designated section, probably) should be like the second part 
+of the ICCM paper: it should introduce the specific model mechanisms of the LV05/E13 model, the 
+parameters that we include, and the mappings from the hypotheses of SP in aphasia to the parameters.
+This can even happen to some more detail than in the ICCM paper, because there is no 6 page limitation
+to this thesis.
+
+\section{Predictions of computational models of sentence processing}
+
+This section should lay the foundation of the project that I plan to do in my PhD:
+The objective in the PhD is to scale up the LV05 model not by reimplementing it, but by
+using smarter optimization techniques, such that not a complete parameter space has to 
+be walked through.
+
+However, this method only works if there is something that one searches for, i.e., if the
+search problem is well-defined. What we also need, in contrast to that, is an overview work
+that lays out the model's predictions for parameters when they go to limits of the feasible,
+i.e.\ when we let parameters grow in directions that could make up a deficit (or however one
+wants to interpret it on the psycholinguistic side), and look at the asymptotic behaviour,
+so to speak.
+
+This section thus constitutes a very exploratory account of what could be done with the model,
+and it provides some kind of baseline for future research.
+
+Originally I planned to do all sorts of model comparisons in this section; however, this is not feasible
+in the time that I have left. Instead, I will take the implemented relations (SR/OR, reflexives, pronouns)
+and calculate fixations and 'dependency completion accuracies' (better term needed) for these construction,
+varying over the three (or better four) parameters \texttt{ans, ga, uns, dat}, and possibly their combinations.
+
+
+\section{A computational investigation of sentence processing in aphasia}
+
+Mainly, this section comprises the work conducted for the ICCM paper. The general structure can be adapted
+somewhat, because the paragraph explaining model mechanisms and hypothesis-to-parameter mappings is just the 
+one before (I still don't know where to put the exploratory predictions paragraph).
+
+\section{Discussion}
+
+blah
+
+\section{Conclusion}
+
+Again, a short section. It should summarise the core points of the work.
+
+%\bibliographystyle{apacite}
+%\bibliography{maetzigetal_iccm17}
+
+\end{document}

@@ -1,0 +1,10 @@
+.DS_Store
+.swp
+.RData
+.Rhistory
+.Rproj.user
+.aux
+.bbl
+.blg
+.log
+.tcl

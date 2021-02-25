@@ -1,0 +1,13 @@
+# Meeting with Shravan on MSc thesis 
+
+## Remarks on MSc thesis
+
+- topic
+- experimental data set by David Caplan et al. (2015)
+    - picture matching
+    - self paced listening
+    - object task 'match relations'
+    - **objective:** choose 4-5 constructions from the data that are already
+      implemented in the LV05 model
+    - fitting LMM on 60 or so subj data would be interesting
+- relevant papers?

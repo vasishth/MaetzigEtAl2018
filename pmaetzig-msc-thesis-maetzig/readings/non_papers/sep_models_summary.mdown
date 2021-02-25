@@ -1,0 +1,79 @@
+# Summary of SEP entry 'Models in Science' ([link](http://plato.stanford.edu/entries/models-science/))
+
+### Contents
+
+1) Semantics: models and representations
+    1) representational models I: models of phenomena
+    2) representational models II: models of data
+    3) models of theory
+2) Ontology: what are models?
+    1) physical objects
+    2) fictional objects
+    3) set-theoretic structures
+    4) descriptions
+    5) equations
+    6) gerrymandered ontologies
+3) Epistemology: learning with models
+    1) learning about the model: experiments, thought experiments and simulation
+    2) converting knowledge about the model into knowledge about the target
+4) Models and theory
+    1) the syntactic and the semantic view of theories
+    2) models as independent of theories
+5) Models and other debates in the philosophy of science
+    1) models and realism vs. antirealism
+    2) models and reductionism
+    3) models and lows of nature
+    4) models and scientific explanation
+6) Conclusion
+
+### 1. Semantics: models and representation
+
+#### :
+
+...
+
+### 3. Epistemology: learning with models
+
+- general assumption: models as *vehicles* for learning about the world
+- models allow for **surrogative reasoning**: by studying a model, we can gain
+  knowledge about what the model stands for (the reality)
+- new style of reasoning emerging from this: 'model based reasoning'
+
+But how is learning with models possible in the first place?
+
+One approach is the **DDI account** (Hughes, 1997)
+
+1) Denotation: establish representation relation between model and target
+2) Demonstration: learn about the model; study features of the model to 
+   demonstrate theoretical claims about its internal constitution or mechanism
+3) Interpretion: convert knowledge about model into claims about the target
+   system
+
+#### 3.1 Learning about the model: experiments, thought experiments and simulation
+
+Learning about a model happens at (1) building the model, and (2) manipulating
+it. The building stage provides insights about the model already because there
+is no simple recipe for building models, so simply getting to run the different
+parts and their interaction is a learning process. The built model, on the other
+hand, has to be investigated and manipulated in order to understand it better.
+
+The methods that are necessary for building and manipulating a model highly
+depend on the kind of the model (e.g., material vs. fictional vs. mathematical
+etc.).
+
+##### Methods for mathematical models
+
+- derive results, solve equations analytically (only simplest math. models)
+- numerical solutions
+- simulations (in natural, as well as social and human sciences):
+    - often used with dynamic models (involving time)
+    - imitating a process in reality (which is often dependent on time) by
+      another process
+    - goal: describe the time-evolution of the target system in some
+      principled way
+    - often the only way to learn about a dynamical model
+
+##### Computer simulations
+
+Simulations are mostly often used in connection with *dynamic models*, i.e.
+those involving time.

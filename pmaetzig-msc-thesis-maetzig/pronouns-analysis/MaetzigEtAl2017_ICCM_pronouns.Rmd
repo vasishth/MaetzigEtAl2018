@@ -1,0 +1,56 @@
+---
+title: "MaetzigEtAl2017 ICCM summary/analysis for additional constructions"
+author: "Paul Mätzig"
+date: "5/11/2017"
+output: pdf_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,fig.height=8,fig.width=8)
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(plot3D)         ## for 3D scatterplots
+library(scatterplot3d)  ## for 3D scatterplots
+library(ggplot2)
+library(ggdendro)
+library(factoextra)
+#opts_chunk$set(warning=FALSE,comment=NA,fig.height=8,fig.width=8)
+```
+
+```{r loaddata,echo=FALSE}
+caplan_data <- read.table('../iccm2017/data/CaplanEtAl_2015_data.txt', header=TRUE)
+model_data_REFL <- read.csv('accuracies-CAPLAN15-SOREFL-2017-05-11-08-48.csv', header=TRUE)
+caplan_data$sent <- as.character(caplan_data$sent)
+
+caplan_data_SR <- filter(caplan_data, sent=='SS')
+caplan_data_OR <- filter(caplan_data, sent=='SO')
+```
+
+```{r preprocessdata_caplan,echo=FALSE}
+caplan_data_SR_acc <- summarise(group_by(caplan_data_SR, subj,item), sum(acc) / n())
+#head(caplan_data_SR_acc)
+#summary(caplan_data_SR_acc)
+#xtabs(~subj+item, caplan_data_SR_acc)
+colnames(caplan_data_SR_acc) <- c('subj', 'item', 'acc')
+caplan_data_SR_acc <- summarise(group_by(caplan_data_SR_acc, subj), sum(acc) / n())
+colnames(caplan_data_SR_acc)<-c('subj', 'acc')
+#summary(caplan_data_SR_acc)
+
+caplan_data_OR_acc <- summarise(group_by(caplan_data_OR, subj,item), sum(acc) / n())
+colnames(caplan_data_OR_acc) <- c('subj', 'item', 'acc')
+#head(caplan_data_OR_acc)
+#summary(caplan_data_OR_acc)
+#xtabs(~subj+item, caplan_data_OR_acc)
+caplan_data_OR_acc <- summarise(group_by(caplan_data_OR_acc, subj), sum(acc) / n())
+colnames(caplan_data_OR_acc)<-c('subj', 'acc')
+#summary(caplan_data_OR_acc)
+```
+
+```{r preprocessdata_sim, echo=FALSE}
+head(model_data_REFL)
+summary(model_data_REFL)
+head(model_data_PRON)
+summary(model_data_PRON)
+```

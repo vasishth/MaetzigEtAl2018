@@ -1,0 +1,105 @@
+\documentclass[main_thesis]{subfiles}
+
+\begin{document}
+
+\chapter{Literature review}
+
+This chapter provides a summary of accounts of processing in aphasia.
+First I will give a brief overview of hypotheses on what constitutes the aphasic sentence processing deficit.
+Following that, I will focus on hypotheses that are concerned with aphasic processing of sentences, in contrast to those about sentence production and lexical processing. 
+Finally, I will discuss some accounts that implement the aforementioned hypotheses of aphasic sentence processing in a computational framework.
+
+\section{Sentence processing and aphasia}\label{sec:hypotheses}
+
+People with aphasia exhibit systematic difficulties in the processing of non-canonical, semantically reversible sentences, compared to unimpaired comprehenders. The deficit is thus observable in the processing of structures where the object precedes the subject of the sentence, such as object relatives, object clefts, object questions, and arguably passives.
+A lot of studies on the aphasic sentence comprehension deficit have been conducted in offline experiments, using paradigms such as sentence-picture matching or object manipulation.\todo{short description of tasks here} The measure that is used to judge comprehension performance is mostly response accuracy.\todo{grammatical sentence?}
+On the other hand, studies investigating online sentence comprehension have been conducted using self-paced listening \cite{Caplanetal2015} and eye-tracking \cite<e.g.,\hbox{}>{Hanneetal2011}.
+
+The way in which the aphasic sentence comprehension deficit is observable in a particular patient is subject to much variability. For example, whether a patient exhibits at-chance or above-chance accuracy in a sentence-picture matching task may depend on the type of aphasia, the patient's age \cite{Burchertetal2011}, and the experimental task\todo{ref} (actives vs.\ passives, subject vs.\ object relatives).
+
+There are two categories of hypotheses of the underlying nature of the aphasic sentence comprehension deficit: \emph{representative accounts} and \emph{processing deficit accounts} \cite<cf.\hbox{}>{Patiletal2016}.
+Representative accounts assume that the deficit is a breakdown of grammatical knowledge, and the deficit is caused by a systematic disturbance of underlying syntactic representations. The most well known representational hypothesis is the \emph{trace deletion hypothesis}, which states that patients of (Broca's) aphasia have lost the ability to represent traces of syntactic movement \cite<see>{Grodzinsky1995, Grodzinsky2000}.
+
+In this work, however, I will focus on \emph{processing deficit accounts}. These accounts will be detailed below.\todo{Change phrasing} 
+These hypotheses assume not a language-specific reason for aphasia and the associated deficit, but try to pin the deficit down to damage to general cognitive mechanisms. In the following paragraphs, I will give a quick overview over different processing deficit accounts. 
+
+I will not discuss at length the multitude of hypotheses and theories of single word processing in aphasia.
+However, the somewhat easier nature of the task of modelling lexical decision, compared to parsing full sentences, did allow for the development of elaborated computational models. Some ideas of these models of single word processing may be transferred to computational models of parsing in aphasia, also because there exist hypotheses\todo{citations} on parsing in aphasia that state a difficulty in lexical processing as (one of) the reasons leading to the aphasic processing deficit. This will be addressed at the end of this section.
+
+
+
+Although for some processing hypotheses introduced below, there may be overlap as to the affected mechanism that causes the disruption in lexical and processing difficulties at the same time, I will only mention this if the processing hypothesis makes some predictions on lexical processing.\todo{Sentence on differences between Broca's and Wernicke's aphasia wrt lexical deficit etc.} 
+
+% order is mostly chronological: slowed processing is very old, IntDef is by Caplan somewhat more recently,:
+% and resource reduction is from Just & Carpenter etc, but recently reconsidered by Caplan because noise
+% cannot explain everything (maybe, probably). Other accounts come after.
+
+\paragraph{Slowed processing}
+
+Considering that a large part of the empirical data on the aphasic sentence processing deficit shows increased reaction and/or reading times, it is intuitive to assume a general slowdown of overall actions in the cognitive system in aphasia. This slowdown can be observed independently from the type of aphasia \cite<e.g.\hbox{}>{Caplanetal2015}, which gives it additional explanatory potential. In some instances, it may be more accurate to speak of \emph{delayed} processing. This is motivated by findings like in \citeA{Hanneetal2011}, where the patients' eye movement patterns corresponded largely to the healthy controls' in both, trials where the patients answered correctly or incorrectly. In the incorrect trials, however, this eye movement pattern showed up with an overall delay in patients, compared to healthy controls.
+
+This hypothesis has also been implemented computationally in ACT-R by \citeA{Patiletal2016} and \citeA{Stocco2005} independently. Although \citeA{Stocco2005} only provide sparse information about the implementation of their model, it is likely that they also manipulated the \emph{default action time} parameter in ACT-R which encodes a fixed delay that is applied between the firing of a rule and executing the actions that the production rule states.\todo{ACT-R details maybe later when I've introduced everything \ldots}
+
+\paragraph{Intermittent deficiencies}
+
+The intermittent deficiency hypothesis states that the aphasic SP deficit is not actually permanent, but only occurs occasionally during processing. The crucial observation that inspired this hypothesis is that people with aphasia do often not behave the same across a sentence comprehension task, but show increased variability. If investigated closely, this variability stems from fundamentally different online processing behaviour of the patients, conditional on whether they provided correct offline responses to a comprehension task. 
+
+For example,\todo{ref: Caplan et al. (2007)} observed normal online performance in aphasics in sentences where any given participant provided a correct offline response. In those trials where the offline response was incorrect, however, patients also exhibited abnormal online performance.\todo{bit more explanation}
+
+The hypothesis is motivated by several online studies of Caplan's, most recently, \citeA{Caplanetal2015}. There, a large data set of 61 people with aphasia and 41 age-matched controls was recorded for self-paced listening and response accuracies towards a picture matching task for 11 pairs of constructions.
+
+The only computational implementation of this account was provided in \citeA{Patiletal2016}, and will be discussed in the following chapters in more depth.
+
+\paragraph{Resource reduction}
+
+Another account of the aphasic sentence comprehension deficit states that a large part of the variability in people with aphasia can be explained by a systematic reduction in working memory resources \cite{Miyakeetal1994}. Essentially, proponents of this account state that people with aphasia show the same general difference as between low and high working memory capacity comprehenders, as described in \citeA{JustCarpenter1992}, just to a more detrimental degree.
+
+This hypothesis has been implemented in a computational model by \citeA{Haarmanetal1997}.
+
+
+
+\paragraph{Timing difficulties}
+
+\begin{itemize}
+  \item disruption caused not by overall delay, but by certain actions in processing/parsing firing too early or late
+  \item has considerable overlap with the more specific lexical access/integration accounts
+  \item models: SYNCHRON (Kolk and Van Grunsven, 1985)\todo{ref}
+\end{itemize}
+
+\paragraph{Lexical access} 
+
+\begin{itemize}
+  \item 
+\end{itemize}
+
+\paragraph{Lexical integration}
+
+\begin{itemize}
+  \item 
+\end{itemize}
+
+\paragraph{P-chain}
+
+
+\paragraph{Focus tree}
+
+\begin{itemize}
+  \item language model from computational linguistics applied to aphasia data \cite{GnjatovicDelic2012}
+\end{itemize}
+
+\paragraph{Other computational models of aphasia}
+
+
+
+\section{Individual differences in sentence processing}
+
+Discussing individual differences in sentence processing, other than aphasia, is relevant to this work because of the modelling method. The \citeA{LewisVasishth2005} model was developed for the processing of healthy adult comprehenders. However, various model parameters can be varied to allow for a specification of the model to individual variability. For example, \citeA{Dailyetal2001}
+
+\section{Computational models of sentence processing}
+
+I'm not sure what (or whether at all) I should include a lit review of the work on computational modelling in general. At the moment I'm leaning towards outsourcing that to the chapter directly following the review, which explains cue-based retrieval and the mechanisms of the \citeA{LewisVasishth2005} model.
+
+\bibliographystyle{apacite}
+\bibliography{bib_thesis}
+
+\end{document}

@@ -1,0 +1,53 @@
+# Meeting MSc Thesis 2016-12-07
+
+## Todo
+
+- decision CUNY or not (leaning no? only 5 days to go) >> yes, don't submit for CUNY, but
+  maybe for CogSci2017 in London
+- topic for presentation in colloquium next week? >> yes, will work
+- proposal how to succeed with simulations (additional experiments + systematic
+  display and interpretation of sim results) >> see below!
+- when to officially register thesis (start of next year? submission would be
+  in Jun 2017, Feb/Mar 2017 earliest)
+    - working topic for registration?
+    - secondary adviser > Bruno? ask him (might be good bc. he knows Felix' implementation
+      very very well; and of course the bayesian implementation)
+
+## Additional discussion (relevant in a few weeks/months)
+
+- using R to do faster simulations >> I think the Said et al (2016) paper can
+  help us to formulate a more rigorous version of ACT-R-in-R, satisfying more
+  assumptions of the original ACT-R model
+    - to what extent are the R simulations of ACT-R still the same model,
+      to what aren't they?
+    - 
+- in the end, in the best case, all three models (Felix' version in ACT-R, 
+  Felix'/Bruno's version in R, and the 'more rigorous update', have to be
+  tested in order to allow comparison between them)
+
+## Problems
+
+- model is not implemented as a fully fledged parser
+    - either: Bruno's route -- simulate retrieval 
+    - or: implement a large scale parser (dependency or PCFG) 
+
+## Work
+
+RELATIVE CLAUSES
+
+1) Just & Carpenter 1991
+2) Grodner & Gibson 2005 Exp 1
+3) G&G 2005 Exp 2 (compare LV05 - new)
+4) Staub et al 2016 CogSci
+5) Staub 2011 (CogSci)
+
+INTERFERENCE EFFECTS
+
+1) Van Dyke & Lewis 2003 (compare LV05 - new)
+
+EFFECTS OF STORAGE LOAD
+
+1) Grodner, Gibson & Tunstall
+
+>> plot TRT, FFD, FPRT, GPT
+>> compare act-r-in-r and new EMMA/ACT-R

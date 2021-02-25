@@ -1,0 +1,58 @@
+This is BibTeX, Version 0.99d (TeX Live 2014)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: pres-colloq-2016.aux
+The style file: apacite.bst
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=20001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: pres-colloq-2016.bib
+Warning--I didn't find a database entry for "Salvucci2001"
+apacite.bst [2013/07/21 v6.03 APA bibliography style]
+You've used 4 entries,
+            6951 wiz_defined-function locations,
+            1299 strings with 11301 characters,
+and the built_in function-call counts, 7081 in all, are:
+= -- 866
+> -- 61
+< -- 312
++ -- 328
+- -- 8
+* -- 455
+:= -- 1298
+add.period$ -- 16
+call.type$ -- 4
+change.case$ -- 68
+chr.to.int$ -- 0
+cite$ -- 8
+duplicate$ -- 186
+empty$ -- 293
+format.name$ -- 103
+if$ -- 1353
+int.to.chr$ -- 0
+int.to.str$ -- 12
+missing$ -- 0
+newline$ -- 103
+num.names$ -- 32
+pop$ -- 97
+preamble$ -- 1
+purify$ -- 16
+quote$ -- 0
+skip$ -- 493
+stack$ -- 0
+substring$ -- 358
+swap$ -- 121
+text.length$ -- 8
+text.prefix$ -- 0
+top$ -- 1
+type$ -- 320
+warning$ -- 0
+while$ -- 33
+width$ -- 0
+write$ -- 127
+(There was 1 warning)

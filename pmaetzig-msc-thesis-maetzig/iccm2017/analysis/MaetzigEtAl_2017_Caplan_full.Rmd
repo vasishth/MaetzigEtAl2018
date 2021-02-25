@@ -1,0 +1,133 @@
+---
+title: "Caplan 10/13 constructions"
+author: "Paul Mätzig"
+date: "8/20/2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(plot3D)         ## for 3D scatterplots
+library(scatterplot3d)  ## for 3D scatterplots
+library(ggplot2)
+library(ggdendro)
+library(factoextra)
+#opts_chunk$set(warning=FALSE,comment=NA,fig.height=8,fig.width=8)
+```
+
+```{r preprocessing_functions, echo=FALSE}
+get_parameters <- function(path=".", file="paramsearch.txt") {
+  param_file                    <- paste(path, file, sep="/")
+  paramsearch                   <- read.table(param_file, header=FALSE)
+  colnames(paramsearch)         <- c("experiment", "set", "file", "params")
+  paramsearch$file              <- as.character(paramsearch$file)
+  paramsearch$simulation_index  <- strsplit(paramsearch$file[1], "/")[[1]][4]
+  paramsearch$params            <- tolower(as.character(paramsearch$params))
+
+  # First loop: split one arbitrary entry of paramsearch$params (because each
+  # row contains all varied parameters) and create variables in the paramsearch
+  # data.frame according to these parameters.
+  params <- substr(paramsearch$params[1], 2, nchar(paramsearch$params[1]) - 1)
+  params <- strsplit(params, " ")[[1]]
+  params <- params[c(TRUE, FALSE)]
+
+  for (i in params) {
+    paramsearch[i] <- rep(NA, dim(paramsearch)[1])
+  }
+
+  # Second loop: for each row in paramsearch, split the current entry of
+  # paramsearch$params, and assign to the corresponding variables (e.g.,
+  # paramsearch$ga) the value of this parameter in the current simulation set.
+  for (i in 1:dim(paramsearch)[1]) {
+    tmp <- substr(paramsearch$params[i], 2, nchar(paramsearch$params[i]) - 1)  # remove parentheses
+    tmp <- strsplit(tmp, " ")[[1]]
+    paramsearch$params[i] <- paste(tmp, collapse="-")
+    params <- tmp[c(TRUE, FALSE)]
+
+    for (j in params) {
+      paramsearch[j][i,] <- as.numeric(tmp[which(tmp %in% j)+1])
+    }
+  }
+
+  return(paramsearch)
+}
+```
+
+```{r loaddata,echo=FALSE}
+caplan_data <- read.csv2('../data/caplan_data_full.csv', header=TRUE)
+paramsearch <- get_parameters(file='../data/CAPLAN15-FULL-20170821-0112/paramsearch.txt')
+
+column_names <- c('experiment', 'iteration', 'condition', 'acc')
+acc1 <- read.table('../data/CAPLAN15-FULL-20170821-0112/1-accuracies.txt')
+colnames(acc1) <- column_names
+levels(acc1$acc) <- c(1, 0)
+acc1$acc <- as.numeric(levels(acc1$acc))[acc1$acc]
+acc2 <- read.table('../data/CAPLAN15-FULL-20170821-0112/2-accuracies.txt')
+colnames(acc2) <- column_names
+levels(acc2$acc) <- c(1, 0)
+acc2$acc <- as.numeric(levels(acc2$acc))[acc2$acc]
+acc3 <- read.table('../data/CAPLAN15-FULL-20170821-0112/3-accuracies.txt')
+colnames(acc3) <- column_names
+levels(acc3$acc) <- c(1, 0)
+acc3$acc <- as.numeric(levels(acc3$acc))[acc3$acc]
+acc4 <- read.table('../data/CAPLAN15-FULL-20170821-0112/4-accuracies.txt')
+colnames(acc4) <- column_names
+levels(acc4$acc) <- c(1, 0)
+acc4$acc <- as.numeric(levels(acc4$acc))[acc4$acc]
+```
+
+```{r preprocess_data, echo=FALSE}
+levels(caplan_data$acc) <- c(NA, 0, 1)
+caplan_data$acc <- as.numeric(levels(caplan_data$acc))[caplan_data$acc]
+caplan_data <- summarise(group_by(caplan_data, subj, sent), acc=sum(acc, na.rm = TRUE) / n())
+levels(caplan_data$sent) <- c("C15-3NP", "C15-A", "C15-OC", "C15-SC", "C15-P", "C15-PRON", "C15-REFL", "C15-OR", "C15-OR-PRON", "C15-OR-REFL", "C15-SR", "C15-SR-PRON", "C15-SR-REFL")
+caplan_data <- subset(caplan_data, ! caplan_data$sent %in% c("C15-OC", "C15-SC", "C15-P"))
+
+c15_acc1 <- summarise(group_by(acc1, condition), acc=mean(acc))
+c15_acc2 <- summarise(group_by(acc2, condition), acc=mean(acc))
+c15_acc3 <- summarise(group_by(acc3, condition), acc=mean(acc))
+c15_acc4 <- summarise(group_by(acc4, condition), acc=mean(acc))
+c15_acc1$simulation <- 1
+c15_acc2$simulation <- 2
+c15_acc3$simulation <- 3
+c15_acc4$simulation <- 4
+model_acc <- rbind(c15_acc1, c15_acc2, c15_acc3, c15_acc4)
+model_acc$ga <- c(rep(c(rep(0.3, 10), rep(1.0, 10)), 2))
+model_acc$dat <- c(rep(0.05, 20), rep(0.1, 20)) 
+model_acc$ans <- rep(0.15, 40)
+
+simulations <- unique(model_acc$simulation)
+subjects <- as.character(unique(caplan_data$subj))
+conditions <- as.character(unique(model_acc$condition))
+
+slots <- array(NA, dim = c(max(model_acc$simulation), length(unique(caplan_data$subj)),
+                   length(unique(model_acc$condition))),
+                   dimnames = list(simulations, subjects, conditions))
+
+for (i in conditions) {  ## loop through conditions
+  for (j in subjects) {  ## loop through subjects
+    for (k in simulations) {  ## loop through param sets
+      tmp_acc <- caplan_data$acc[caplan_data$sent == i]
+      slots[k, , i] <- abs(model_acc$acc[model_acc$condition == i & model_acc$simulation == k] - tmp_acc)
+    }
+  }
+}
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+

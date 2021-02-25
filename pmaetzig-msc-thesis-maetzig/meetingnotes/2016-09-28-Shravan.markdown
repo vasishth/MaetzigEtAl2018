@@ -1,0 +1,46 @@
+# Status quo
+
+- performed preliminary analysis of some combinations of :ans, :dat and :ga parameters
+- ERROR: :dat parameter in some simulation series way to high (0.5 instead of 0.05 e.g.), e.g. in series GG-EXP1-20160927-2311
+- current simulations for parameter settings might not replicate, but be noise
+
+# TODO[paul]
+
+- delete 2311 with wrong :dat parameter values and rerun
+- **model checking:**
+    - for all the current parameter combinations, rerun 100 iterations 4 times each
+    - with these data, plot TRT (additionally also other measures?) for OR/SR
+      in relation to run (1--4)
+    - *purpose:* check whether the patterns for non-standard parameter settings
+      replicate
+- **model predictions:**
+    - for 100 iterations each, gather predictions for all the parameter 
+      combinations until today
+    - more fine-grained parameter sweep for :ans necessary (step width
+      something like 0.02 or even 0.01)
+    - in a data frame, for TRT, gather mean values + CI (or similar) comparing
+      embedded and main verb, for each parameter combination (see image below)
+    - *purpose:*
+        - understand the influence of the three parameters on model 
+          performance, as well as the influence of their combinations
+- **getting proportions of correct attachments:**
+    - for each of the iterations (should make a smaller selection first of
+      those parameter combinations that look promising), extract verbose
+      ACT-R output of each iteration and pipe to .txt file
+    - use *awk* (or python) to extract all lines which contain `+++  Relation: "DOG" is "subject" of "BIT"  +++`
+      and pipe to .txt again
+    - calculate proportions of correct retrievals from this
+    - compare these proportions with the Caplan (2015) data; more specifically, 
+      to the comprehension question response accuracy from the aphasics
+      (should also compare Caplan's Q response accuracy data of healthy controls
+      to the ACT-R simulations with default model parameters)
+
+# future goals
+
+- check whether :ga parameter can be used to model working memory differences
+  (Just & Carpenter, 1991)
+- 
+
+# Image: sketch of plot for comparison of predictions
+
+![Figure 1: sketch of plot for comparison of model predictions for different parameter settings](/Users/paul/ownCloud/potsdam_msc_ling/msc-thesis-maetzig/meetingnotes)

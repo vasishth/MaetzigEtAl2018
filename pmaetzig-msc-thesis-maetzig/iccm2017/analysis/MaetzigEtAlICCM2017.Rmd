@@ -1,0 +1,636 @@
+---
+title: "Preliminary summary of results, Maetzig et al ICCM2017"
+author: "Shravan Vasishth"
+date: "2/20/2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,fig.height=8,fig.width=8)
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(plot3D)         ## for 3D scatterplots
+library(scatterplot3d)  ## for 3D scatterplots
+library(ggplot2)
+library(ggdendro)
+library(factoextra)
+#opts_chunk$set(warning=FALSE,comment=NA,fig.height=8,fig.width=8)
+```
+
+```{r loaddata,echo=FALSE}
+caplan_data <- read.table('../data/CaplanEtAl_2015_data.txt', header=TRUE)
+model_data_SR <- read.csv('../data/response_accuracies_GG_SR_2017016_1736.csv', header=TRUE)
+model_data_OR <- read.csv('../data/response_accuracies_GG_OR_2017018_1827.csv', header=TRUE)
+caplan_data$sent <- as.character(caplan_data$sent)
+
+caplan_data_SR <- filter(caplan_data, sent=='SS')
+caplan_data_OR <- filter(caplan_data, sent=='SO')
+```
+
+```{r preprocessdata,echo=FALSE}
+# data are not balanced, see:
+#xtabs(~subj+item, caplan_data_SR)
+#xtabs(~subj+item, caplan_data_OR)
+
+caplan_data_SR_acc <- summarise(group_by(caplan_data_SR, subj,item), sum(acc) / n())
+#head(caplan_data_SR_acc)
+#summary(caplan_data_SR_acc)
+#xtabs(~subj+item, caplan_data_SR_acc)
+colnames(caplan_data_SR_acc) <- c('subj', 'item', 'acc')
+caplan_data_SR_acc <- summarise(group_by(caplan_data_SR_acc, subj), sum(acc) / n())
+colnames(caplan_data_SR_acc)<-c('subj', 'acc')
+#summary(caplan_data_SR_acc)
+
+caplan_data_OR_acc <- summarise(group_by(caplan_data_OR, subj,item), sum(acc) / n())
+colnames(caplan_data_OR_acc) <- c('subj', 'item', 'acc')
+#head(caplan_data_OR_acc)
+#summary(caplan_data_OR_acc)
+#xtabs(~subj+item, caplan_data_OR_acc)
+caplan_data_OR_acc <- summarise(group_by(caplan_data_OR_acc, subj), sum(acc) / n())
+colnames(caplan_data_OR_acc)<-c('subj', 'acc')
+#summary(caplan_data_OR_acc)
+
+slots_SR <- matrix(rep(NA, dim(model_data_SR)[1]*dim(caplan_data_SR_acc)[1]), ncol=dim(caplan_data_SR_acc)[1])
+slots_OR <- matrix(rep(NA, dim(model_data_OR)[1]*dim(caplan_data_OR_acc)[1]), ncol=dim(caplan_data_OR_acc)[1])
+
+for (i in 1:length(caplan_data_SR_acc$subj)) {
+  tmp_acc <- caplan_data_SR_acc$acc[i]
+  slots_SR[,i] <- abs(model_data_SR$acc - tmp_acc)
+}
+
+for (i in 1:length(caplan_data_OR_acc$subj)) {
+  tmp_acc <- caplan_data_OR_acc$acc[i]
+  slots_OR[,i] <- abs(model_data_OR$acc - tmp_acc)
+}
+
+colnames(slots_SR) <- paste("s", caplan_data_SR_acc$subj, sep = "")
+colnames(slots_OR) <- paste("s", caplan_data_OR_acc$subj, sep = "")
+
+model_data_SR <- cbind(model_data_SR, slots_SR)
+model_data_OR <- cbind(model_data_OR, slots_OR)
+
+get_min_params <- function(data, subject) {
+  ref <- which(data[c(subject)]==min(data[c(subject)]))
+  params <- data[ref, c("GA", "DAT", "ANS")]
+  return(params)
+}
+
+subjects_SR <- colnames(model_data_SR)[9:dim(model_data_SR)[2]]
+subjects_OR <- colnames(model_data_OR)[9:dim(model_data_OR)[2]]
+
+results_SR <- data.frame()
+for (i in 1:length(subjects_SR)) {
+  tmp <- get_min_params(model_data_SR, subjects_SR[i])
+  tmp$subj <- rep(subjects_SR[i], dim(tmp)[1])
+  results_SR <- rbind(results_SR, tmp, make.row.names=FALSE)
+}
+
+#subjects<-unique(results_SR$subj)
+#for(i in 1:length(subjects)){
+#print(dim(subset(results_SR,subj==subjects[i]))[1])
+#}
+  
+results_OR <- data.frame()
+for (i in 1:length(subjects_OR)) {
+  tmp <- get_min_params(model_data_OR, subjects_OR[i])
+  tmp$subj <- rep(subjects_OR[i], dim(tmp)[1])
+  results_OR <- rbind(results_OR, tmp, make.row.names=FALSE)
+}
+
+## splitting data by SR/OR condition and by control/IWA group
+results_SR_controls <- results_SR[1:(min(which(results_SR$subj=="s54001"))-1), ]
+results_SR_iwa <- results_SR[min(which(results_SR$subj=="s54001")):dim(results_SR)[1], ]
+results_OR_controls <- results_OR[1:(min(which(results_OR$subj=="s54001"))-1), ]
+results_OR_iwa <- results_OR[min(which(results_OR$subj=="s54001")):dim(results_OR)[1], ]
+```
+
+I (SV) tried averaging so that we have only one set of parameters per subject:
+
+```{r}
+if(1){
+## averaging values for each subject:
+control_subj<-unique(results_SR_controls$subj)
+results_SR_c_mn <- data.frame()
+for(i in control_subj){
+      tmp<-subset(results_SR_controls,subj==i)
+      temp<-data.frame(GA=mean(tmp$GA),DAT=mean(tmp$DAT),ANS=mean(tmp$ANS),subj=i)
+      results_SR_c_mn<-rbind(results_SR_c_mn,
+                        temp,make.row.names=FALSE)
+}
+
+control_subj<-unique(results_OR_controls$subj)
+results_OR_c_mn <- data.frame()
+for(i in control_subj){
+      tmp<-subset(results_OR_controls,subj==i)
+      temp<-data.frame(GA=mean(tmp$GA),DAT=mean(tmp$DAT),ANS=mean(tmp$ANS),subj=i)
+      results_OR_c_mn<-rbind(results_OR_c_mn,
+                        temp,make.row.names=FALSE)
+}
+
+iwa_subj<-unique(results_SR_iwa$subj)
+results_SR_i_mn <- data.frame()
+for(i in iwa_subj){
+      tmp<-subset(results_SR_iwa,subj==i)
+      temp<-data.frame(GA=mean(tmp$GA),DAT=mean(tmp$DAT),ANS=mean(tmp$ANS),subj=i)
+      results_SR_i_mn<-rbind(results_SR_i_mn,
+                        temp,make.row.names=FALSE)
+}
+
+iwa_subj<-unique(results_OR_iwa$subj)
+results_OR_i_mn <- data.frame()
+for(i in iwa_subj){
+      tmp<-subset(results_OR_iwa,subj==i)
+      temp<-data.frame(GA=mean(tmp$GA),DAT=mean(tmp$DAT),ANS=mean(tmp$ANS),subj=i)
+      results_OR_i_mn<-rbind(results_OR_i_mn,
+                        temp,make.row.names=FALSE)
+}
+
+results_SR_controls<-results_SR_c_mn
+results_OR_controls<-results_OR_c_mn
+results_SR_iwa<-results_SR_i_mn
+results_OR_iwa<-results_OR_i_mn
+}
+
+# coding subjects as factors
+results_SR_controls$subj <- as.integer(factor(results_SR_controls$subj))
+results_OR_controls$subj <- as.integer(factor(results_OR_controls$subj))
+
+results_SR_iwa$subj <- as.integer(factor(results_SR_iwa$subj))
+results_OR_iwa$subj <- as.integer(factor(results_OR_iwa$subj))
+
+## Trying out how plot with subj number (as integers) looks like
+## However, not very readable and too much visual information, and clustering
+## information is lost
+#tmpSRcontrol <- cbind(jitter(results_SR_controls[,1], factor=10),
+#                      jitter(results_SR_controls[,2], factor=4),
+#                      jitter(results_SR_controls[,3], factor=4) )
+#s3d <- scatterplot3d(tmpSRcontrol[, 1:3], pch = "")
+#text(s3d$xyz.convert(tmpSRcontrol[, 1:3]), labels = results_SR_controls$subj,
+#     col = "steelblue",cex=1.5)}
+```
+
+We can do exploratory analyses. 
+
+# Impressions from plots
+
+  - In SR controls, noise seems to be generally low, but in SR iwa noise is higher.
+  - In SR controls, DAT is generally low, with a few trials have high DAT, but in SR iwa there is higher proportion of high DAT.
+  - In SR controls, GA tends to be high in controls, bit in SR iwa there is a higher proportion of low GA
+  - In OR controls, noise is in general low, but in SR iwa noise tends to be higher.
+  - In OR controls, GA is generally high, in OR iwa there is a large proportion of low GA. 
+  - In OR controls, DAT is generally fast, with a few slow cases, but in OR iwa there is a higher proportion of slow cases.
+  
+  
+Correlations:
+
+```{r}
+cor(results_SR_controls[,1:3])
+cor(results_SR_iwa[,1:3])
+cor(results_OR_controls[,1:3])
+cor(results_OR_iwa[,1:3])
+library(lattice)
+splom(results_SR_controls[,1:3])
+splom(results_SR_iwa[,1:3])
+splom(results_OR_controls[,1:3])
+splom(results_OR_iwa[,1:3])
+```
+
+```{r plot3d_1,echo=FALSE, eval=FALSE}
+#pdf(file="../manuscript/figures/SR_controls.pdf", paper="a4")
+par(mfrow=c(2,2))
+scatter3D(jitter(results_SR_controls$GA,factor=4),
+          jitter(results_SR_controls$DAT,factor=4),
+          jitter(results_SR_controls$ANS), colvar=NULL,
+          col='black', pch = 19, cex = 1, phi=0,
+          xlab="GA", ylab="DAT", zlab="ANS", ticktype="detailed", bty="g",main="Controls, SR")
+
+scatter3D(jitter(results_SR_iwa$GA,factor=4),
+          jitter(results_SR_iwa$DAT,factor=4),
+          jitter(results_SR_iwa$ANS,factor=4),
+          colvar=NULL, col='black', pch = 19, cex = 1, phi=0,
+          xlab="GA", ylab="DAT", zlab="ANS", ticktype="detailed", bty="g",main="IWA, SR")
+
+scatter3D(jitter(results_OR_controls$GA,factor=4),
+          jitter(results_OR_controls$DAT,factor=4),
+          jitter(results_OR_controls$ANS,factor=4),
+          colvar=NULL, col='black', pch = 19, cex = 1, phi=0,
+          xlab="GA", ylab="DAT", zlab="ANS", ticktype="detailed", bty="g",main="Controls, OR")
+
+scatter3D(jitter(results_OR_iwa$GA,factor=4),
+          jitter(results_OR_iwa$DAT,factor=4),
+          jitter(results_OR_iwa$ANS,factor=4),
+          colvar=NULL, col='black', pch = 19, cex = 1, phi=0,
+          xlab="GA", ylab="DAT", zlab="ANS", ticktype="detailed", bty="g",main="IWA, OR")
+```
+
+```{r plot2d_1a,echo=FALSE,eval=FALSE}
+# base R plots without colours and jitter (can be added at will)
+# plot(results_SR_controls$GA, results_SR_controls$DAT, pch=19, xlab="GA", ylab="DAT")
+# plot(results_SR_controls$GA, results_SR_controls$ANS, pch=19, xlab="GA", ylab="ANS")
+# plot(results_SR_controls$DAT, results_SR_controls$ANS, pch=19, xlab="DAT", ylab="ANS")
+print(p_SR_controls_GA_DAT <- ggplot(data=results_SR_controls, aes(x=GA, y=DAT)) + geom_jitter(aes(colour=subj)) + ggtitle("SR controls, GA and DAT"))
+
+print(p_SR_controls_GA_ANS <- ggplot(data=results_SR_controls, aes(x=GA, y=ANS)) + geom_jitter(aes(colour=subj)) + ggtitle("SR controls, GA and ANS"))
+print(p_SR_controls_DAT_ANS <- ggplot(data=results_SR_controls, aes(x=DAT, y=ANS)) + geom_jitter(aes(colour=subj)) + ggtitle("SR controls, DAT and ANS"))
+#dev.off()
+```
+
+```{r plot3d_2,echo=FALSE}
+#pdf(file="../manuscript/figures/SR_iwa.pdf", paper="a4")
+#par(mfrow=c(2,2))
+scatter3D(jitter(results_SR_iwa$GA),
+          jitter(results_SR_iwa$DAT),
+          jitter(results_SR_iwa$ANS),
+          colvar=NULL, col='black', pch = 19, cex = 1, phi=0,
+          xlab="GA", ylab="DAT", zlab="ANS", ticktype="detailed", bty="g",main="IWA, SR")
+```
+
+```{r plot3d_2a,echo=FALSE,eval=FALSE}
+# base R plots without colours and jitter (can be added at will)
+# plot(results_SR_iwa$GA, results_SR_iwa$DAT, pch=19, xlab="GA", ylab="DAT")
+# plot(results_SR_iwa$GA, results_SR_iwa$ANS, pch=19, xlab="GA", ylab="ANS")
+# plot(results_SR_iwa$DAT, results_SR_iwa$ANS, pch=19, xlab="DAT", ylab="ANS")
+print(p_SR_control_GA_DAT <- ggplot(data=results_SR_iwa, aes(x=GA, y=DAT)) + geom_jitter(aes(colour=subj)) + ggtitle("SR iwa, GA and DAT"))
+print(p_SR_control_GA_ANS <- ggplot(data=results_SR_iwa, aes(x=GA, y=ANS)) + geom_jitter(aes(colour=subj)) + ggtitle("SR iwa, GA and ANS"))
+print(p_SR_control_DAT_ANS <- ggplot(data=results_SR_iwa, aes(x=DAT, y=ANS)) + geom_jitter(aes(colour=subj)) + ggtitle("SR iwa, DAT and ANS"))
+#dev.off()
+```
+
+
+```{r plot3d_3,echo=FALSE}
+#pdf(file="../manuscript/figures/OR_controls.pdf", paper="a4")
+#par(mfrow=c(2,2))
+scatter3D(jitter(results_OR_controls$GA),
+          jitter(results_OR_controls$DAT),
+          jitter(results_OR_controls$ANS),
+          colvar=NULL, col='black', pch = 19, cex = 1, phi=0,
+          xlab="GA", ylab="DAT", zlab="ANS", ticktype="detailed", bty="g",main="Controls, SR")
+```
+
+```{r plot3d_3a,echo=FALSE,eval=FALSE}
+# base R plots without colours and jitter (can be added at will)
+# plot(results_OR_controls$GA, results_OR_controls$DAT, pch=19, xlab="GA", ylab="DAT")
+# plot(results_OR_controls$GA, results_OR_controls$ANS, pch=19, xlab="GA", ylab="ANS")
+# plot(results_OR_controls$DAT, results_OR_controls$ANS, pch=19, xlab="DAT", ylab="ANS")
+print(p_OR_controls_GA_DAT <- ggplot(data=results_OR_controls, aes(x=GA, y=DAT)) + geom_jitter(aes(colour=subj)) + ggtitle("OR controls, GA and DAT"))
+print(p_OR_controls_GA_ANS <- ggplot(data=results_OR_controls, aes(x=GA, y=ANS)) + geom_jitter(aes(colour=subj)) + ggtitle("OR controls, GA and ANS"))
+print(p_OR_controls_DAT_ANS <- ggplot(data=results_OR_controls, aes(x=DAT, y=ANS)) + geom_jitter(aes(colour=subj)) + ggtitle("OR controls, DAT and ANS"))
+#dev.off()
+```
+
+```{r plot3d_4,echo=FALSE}
+#pdf(file="../manuscript/figures/OR_iwa.pdf", paper="a4")
+#par(mfrow=c(2,2))
+scatter3D(jitter(results_OR_iwa$GA),
+          jitter(results_OR_iwa$DAT),
+          jitter(results_OR_iwa$ANS),
+          colvar=NULL, col='black', pch = 19, cex = 1, phi=0,
+          xlab="GA", ylab="DAT", zlab="ANS", ticktype="detailed", bty="g",main="IWA, OR")
+```
+
+```{r plot3d_4a,echo=FALSE,eval=FALSE}
+# base R plots without colours and jitter (can be added at will)
+# plot(results_OR_iwa$GA, results_OR_iwa$DAT, pch=19, xlab="GA", ylab="DAT")
+# plot(results_OR_iwa$GA, results_OR_iwa$ANS, pch=19, xlab="GA", ylab="ANS")
+# plot(results_OR_iwa$DAT, results_OR_iwa$ANS, pch=19, xlab="DAT", ylab="ANS")
+print(p_OR_iwa_GA_DAT <- ggplot(data=results_OR_iwa, aes(x=GA, y=DAT)) + geom_jitter(aes(colour=subj)) + ggtitle("OR iwa, GA and DAT"))
+print(p_OR_iwa_GA_ANS <- ggplot(data=results_OR_iwa, aes(x=GA, y=ANS)) + geom_jitter(aes(colour=subj)) + ggtitle("OR iwa, GA and ANS"))
+print(p_OR_iwa_DAT_ANS <- ggplot(data=results_OR_iwa, aes(x=DAT, y=ANS)) + geom_jitter(aes(colour=subj)) + ggtitle("OR iwa, DAT and ANS"))
+#dev.off()
+```
+
+```{r plot1d_1,echo=FALSE}
+## comparing distributions:
+pdf(file="../manuscript/figures/margSR.pdf", width=10, height=4)
+op<-par(
+    mar=c(2,4.5,4,2), 
+    mfrow=c(1,3),pty="s",
+    oma = c(2,10,2,2)
+    )
+plot(density(results_SR_controls$GA),main="Subject relatives",xlim=c(.2,1.1),ylab="Density",
+     xlab="Goal activation \n (resource reduction)", cex.lab=1.5, cex.axis=1.3, cex.main=1.5, cex.sub=1.4, ann = FALSE)
+lines(density(results_SR_iwa$GA),lty=2)
+abline(v=1.0, col='red')
+legend(x=.3,y=2,legend=c("controls","IWA"),lty=1:2)
+mtext(side = 1, text = "Goal activation \n (resource reduction)", line = 5)
+mtext(side = 2, text = "density", line = 3)
+
+plot(density(results_SR_controls$DAT),xlab="Default action time\n (slowed processing)",main="Subject relatives",xlim=c(.05,.1),ylim=c(0,30), cex.lab=1.5, cex.axis=1.3, cex.main=1.5, cex.sub=1.4, ann = FALSE)
+lines(density(results_SR_iwa$DAT),xlab="DAT",lty=2)
+abline(v=0.05, col='red')
+mtext(side = 1, text = "Default action time \n (slowed processing)", line = 5)
+mtext(side = 2, text = "density", line = 3)
+
+plot(density(results_SR_controls$ANS),xlab="Noise (intermittent deficiency)",main="Subject relatives",xlim=c(.15,.45), cex.lab=1.5, cex.axis=1.3, cex.main=1.5, cex.sub=1.4, ann = FALSE)
+lines(density(results_SR_iwa$ANS),lty=2)
+abline(v=0.15, col='red')
+mtext(side = 1, text = "Activation noise \n (intermittent deficiency)", line = 5)
+mtext(side = 2, text = "density", line = 3)
+dev.off()
+
+```
+
+```{r}
+pdf(file="../manuscript/figures/margOR.pdf", width=10, height=4)
+op<-par(
+    mar=c(2,4.5,4,2), 
+    mfrow=c(1,3),pty="s",
+    oma = c(2,10,2,2)
+    )
+plot(density(results_OR_controls$GA),main="Object relatives",xlim=c(.2,1.1),ylab="Density",
+     xlab="Goal activation \n (resource reduction)", cex.lab=1.5, cex.axis=1.3, cex.main=1.5, cex.sub=1.4, ann = FALSE)
+lines(density(results_OR_iwa$GA),lty=2)
+abline(v=1.0, col='red')
+legend(x=.3,y=2,legend=c("controls","IWA"),lty=1:2)
+mtext(side = 1, text = "Goal activation \n (resource reduction)", line = 5)
+mtext(side = 2, text = "density", line = 3)
+
+plot(density(results_OR_controls$DAT),xlab="Default action time\n (slowed processing)",main="Object relatives",xlim=c(.05,.1),ylim=c(0,30), cex.lab=1.5, cex.axis=1.3, cex.main=1.5, cex.sub=1.4, ann = FALSE)
+lines(density(results_OR_iwa$DAT),xlab="DAT",lty=2)
+abline(v=0.05, col='red')
+mtext(side = 1, text = "Default action time \n (slowed processing)", line = 5)
+mtext(side = 2, text = "density", line = 3)
+
+plot(density(results_OR_controls$ANS),xlab="Noise (intermittent deficiency)",main="Object relatives",xlim=c(.15,.45), cex.lab=1.5, cex.axis=1.3, cex.main=1.5, cex.sub=1.4, ann = FALSE)
+lines(density(results_OR_iwa$ANS),lty=2)
+abline(v=0.15, col='red')
+mtext(side = 1, text = "Activation noise \n (intermittent deficiency)", line = 5)
+mtext(side = 2, text = "density", line = 3)
+dev.off()
+
+```
+
+# Exploring the mixing distributions for GA
+
+The mixture estimates don't really tell us much. In ORs I would have expected a higher proportion of low GA in iwa. But the mixture model is clearly failing to identify the mixing distributions. 
+
+```{r}
+# mixtools
+library(mixtools)
+
+## In SRs, higher proportion of low GA in iwa than controls:
+mixmodSRcGA <- normalmixEM(results_SR_controls$GA, 
+                           lambda = c(1/2), ## inits 
+                           mu = c(.3,.9), ## inits
+                           sigma = 1)
+summary(mixmodSRcGA)
+
+mixmodSRiGA <- normalmixEM(results_SR_iwa$GA, 
+                           lambda = c(1/2), ## inits 
+                           mu = c(.2,.9), ## inits
+                           sigma = 1)
+summary(mixmodSRiGA)
+
+## In ORs iwa have lower goal activations and more variance than controls:
+mixmodORcGA <- normalmixEM(results_OR_controls$GA, 
+                      lambda = c(1/2), ## inits 
+                      mu = c(.04,.08), ## inits
+                      sigma = 1)
+summary(mixmodORcGA)
+
+mixmodORiGA <- normalmixEM(results_OR_iwa$GA, 
+                           lambda = c(1/2), ## inits 
+                           mu = c(.04,.1), ## inits
+                           sigma = 1)
+summary(mixmodORiGA)
+```
+
+# Hierarchical clustering
+
+I don't see much of a difference between the two groups in the clustering.
+
+In SRs I chose centroid as the method because that gives the best discrimination ability between controls and iwa.
+
+```{r controlsSR, echo=FALSE}
+clustersSRc<-hclust(dist(results_SR_controls[,1:3],
+                         method="euclidean"),method="centroid")
+
+hcdata2 <- dendro_data(clustersSRc, 
+                       type="rectangle")
+
+
+ggdendrogram(hcdata2,rotate=TRUE, size=2) + 
+  ggtitle("Hierarchical clustering, SR controls")+  coord_flip()
+```
+
+```{r iwaSR, echo=FALSE}
+clustersSRi<-hclust(dist(results_SR_iwa[,1:3],
+                         method="euclidean"),method="centroid")
+
+hcdata2 <- dendro_data(clustersSRi, 
+                       type="rectangle")
+
+ggdendrogram(hcdata2,rotate=TRUE, size=2) + 
+  ggtitle("Hierarchical clustering, SR iwa")+  coord_flip()
+```
+
+
+For ORs I chose complete as method because it gives the best discriminative performance between controls and iwa.
+
+```{r controlsOR, echo=FALSE}
+clustersORc<-hclust(dist(results_OR_controls[,1:3],
+                         method="euclidean"),method="complete")
+
+hcdata2 <- dendro_data(clustersORc, 
+                       type="rectangle")
+
+ggdendrogram(hcdata2,rotate=TRUE, size=2) + 
+  ggtitle("Hierarchical clustering, OR controls")+  coord_flip()
+```
+
+```{r iwaOR, echo=FALSE}
+clustersORi<-hclust(dist(results_OR_iwa[,1:3],
+                         method="euclidean"),method="complete")
+
+hcdata2 <- dendro_data(clustersORi, 
+                       type="rectangle")
+
+ggdendrogram(hcdata2,rotate=TRUE, size=2) + 
+  ggtitle("Hierarchical clustering, OR iwa")+  coord_flip()
+```
+
+
+# Principal components analysis
+
+We can see whether we can discriminate between controls and aphasics by decomposing the three dimensions into its principal components.
+
+```{r}
+## combining controls and patient data:
+results_SR_controls$type<-"control"
+results_SR_iwa$type<-"iwa"
+results_SR<-rbind(results_SR_controls,results_SR_iwa)
+#summary(results_SR)
+
+## we will use correlations, because the scales are different:
+pcSR<-prcomp(results_SR[,1:3],scale=TRUE)
+summary(pcSR)
+#screeplot(pcSR)
+#pcSR$sdev
+```
+
+```{r}
+round(head(pcSR$rotation, 5), 2)
+```
+
+The first component separates GA from the ANS, DAT, the third component separates ANS and DAT, GA.
+
+```{r}
+results_OR_controls$type<-"control"
+results_OR_iwa$type<-"iwa"
+results_OR<-rbind(results_OR_controls,results_OR_iwa)
+
+pcOR<-prcomp(results_OR[,1:3],scale=TRUE)
+summary(pcOR)
+round(head(pcOR$rotation, 5), 2)
+```
+
+The first component separates GA and ANS, DAT, and the second component separates ANS and GA, DAT.
+
+# Discrimination ability using hierarchical clustering
+
+The discrimination ability is OK for controls, but below 50\% for iwa, suggesting that the three parameters don't give us much ability to discriminate controls and iwa.
+
+```{r}
+clusters <- hclust(dist(results_SR[, 1:3]),method="centroid")
+clusterCut <- cutree(clusters, 2)
+## not able to identify aphasics well
+table(clusterCut, results_SR$type)
+96/(96+25)
+45/(45+57)
+```
+
+Consider ORs. In ORs, the discrimination ability is a bit better than SRs, but not really good. The three parameters do allow us to discriminate between the two groups.
+
+```{r}
+clusters <- hclust(dist(results_OR[, 1:3]),method="centroid")
+clusterCut <- cutree(clusters, 2)
+## so-so discrimination ability for aphasics:
+table(clusterCut, results_OR$type)
+```
+
+# Discrimination ability using k-means
+
+I'm using the `factoextra` package for an automatised workflow for k-means and their implementation of the gap statistic (cf. Hastie, Tibshirani \& Friedman, 2008 2nd ed, p. 519f.). Using the `eclust` function with method k-means and a k equal to NULL results in estimation of optimal cluster size using the gap statistic.
+
+```{r}
+library(factoextra)
+SR_clusters <- eclust(results_SR[, 1:3], k=2)
+table(SR_clusters$cluster, results_SR$type)
+# SR, controls
+(101/(101+23))
+# SR, iwa
+(42/(60+42))
+```
+
+```{r}
+OR_clusters <- eclust(results_OR[, 1:3], k=2)
+table(OR_clusters$cluster, results_OR$type)
+(103/(102+17))
+(45/(41+45))
+```
+
+# Exploratory analysis of sub-clusters in SR/OR + controls/iwa
+
+I disabled the code chunks for this section, because I think this kind of exploratory analysis will make more sense once we have data from more constructions.
+
+This doesn't return any results but the fact that kmeans might not be the best idea to estimate the number of clusters for this problem. They are estimated with the gap statistic with the `firstSEmax` method, which looks for the smallest $k$ such that $f(k)$ is not more than 1 standard error away from the first local maximum.
+
+```{r, echo=FALSE, eval=FALSE}
+SR_controls_clusters <- eclust(results_SR_controls[, 1:3], k.max=10)
+print(SR_controls_clusters$nbclust)
+SR_iwa_clusters <- eclust(results_SR_iwa[, 1:3], k.max=10)
+print(SR_iwa_clusters$nbclust)
+OR_controls_clusters <- eclust(results_OR_controls[, 1:3], k.max=10)
+print(OR_controls_clusters$nbclust)
+OR_iwa_clusters <- eclust(results_OR_iwa[, 1:3], k.max=10)
+print(OR_iwa_clusters$nbclust)
+```
+
+This is same again, but this time with the gap statistic proposed by Tibshirani et al (2001). It always returns that $k_{max}$ is the best cluster size. K-means does not discriminate different clusters in the 4 datasets (SR-controls, SR-iwa, OR-controls, OR-iwa), and also, according to these results, there are not less and clearer clusters in the controls vs. the iwa datasets.
+
+```{r, echo=FALSE, eval=FALSE}
+SR_controls_clusters <- eclust(results_SR_controls[, 1:3], k.max=10, gap_maxSE = list(method="Tibs2001SEmax"))
+print(SR_controls_clusters$nbclust)
+SR_iwa_clusters <- eclust(results_SR_iwa[, 1:3], k.max=10, gap_maxSE = list(method="Tibs2001SEmax"))
+print(SR_iwa_clusters$nbclust)
+OR_controls_clusters <- eclust(results_OR_controls[, 1:3], k.max=10, gap_maxSE = list(method="Tibs2001SEmax"))
+print(OR_controls_clusters$nbclust)
+OR_iwa_clusters <- eclust(results_OR_iwa[, 1:3], k.max=10, gap_maxSE = list(method="Tibs2001SEmax"))
+print(OR_iwa_clusters$nbclust)
+```
+
+# Distributions of subjects
+
+```{r}
+results_SR$RCType<-"SR"
+results_OR$RCType<-"OR"
+results_all<-rbind(results_SR,results_OR)
+
+results_all$DATnormal<-ifelse(results_all$DAT > .06,
+       "elevated","normal")
+xtabs(~DATnormal+type+RCType,results_all)
+
+results_all$ANSnormal<-ifelse(results_all$ANS > .2,
+       "elevated","normal")
+xtabs(~ANSnormal+type+RCType,results_all)
+
+results_all$GAnormal<-ifelse(results_all$GA < .8,
+       "elevated","normal")
+xtabs(~GAnormal+type+RCType,results_all)
+
+## two impairments:
+results_all$DATGAnormal<-ifelse(results_all$DAT > .06 & results_all$GA < .8,
+       "elevated","normal")
+xtabs(~DATGAnormal+type+RCType,results_all)
+
+results_all$ANSGAnormal<-ifelse(results_all$ANS > .2 & results_all$GA < .8,
+       "elevated","normal")
+xtabs(~ANSGAnormal+type+RCType,results_all)
+
+results_all$DATANSnormal<-ifelse(results_all$DAT > .06 & results_all$ANS > .2,
+       "elevated","normal")
+xtabs(~DATANSnormal+type+RCType,results_all)
+
+## all three
+results_all$GADATANSnormal<-ifelse(results_all$GA < 0.8 & results_all$DAT > .06 & results_all$ANS > .2,
+       "elevated","normal")
+xtabs(~GADATANSnormal+type+RCType,results_all)
+```
+
+#### Proportion of normal values for controls
+
+proportion of controls, SR with normal ANS: `r length(results_all$ANSnormal[which(results_all$RCType=='SR' & results_all$type=='control' & results_all$ANSnormal=='normal')]) / length(results_all$ANSnormal[which(results_all$RCType=='SR' & results_all$type=='control')])`
+
+proportion of controls, SR with normal DAT: `r length(results_all$DATnormal[which(results_all$RCType=='SR' & results_all$type=='control' & results_all$DATnormal=='normal')]) / length(results_all$DATnormal[which(results_all$RCType=='SR' & results_all$type=='control')])`
+
+proportion of controls, SR with normal GA: `r length(results_all$GAnormal[which(results_all$RCType=='SR' & results_all$type=='control' & results_all$GAnormal=='normal')]) / length(results_all$GAnormal[which(results_all$RCType=='SR' & results_all$type=='control')])`
+
+proportion of controls, OR with normal ANS: `r length(results_all$ANSnormal[which(results_all$RCType=='OR' & results_all$type=='control' & results_all$ANSnormal=='normal')]) / length(results_all$ANSnormal[which(results_all$RCType=='OR' & results_all$type=='control')])`
+
+proportion of controls, OR with normal DAT: `r length(results_all$DATnormal[which(results_all$RCType=='OR' & results_all$type=='control' & results_all$DATnormal=='normal')]) / length(results_all$DATnormal[which(results_all$RCType=='OR' & results_all$type=='control')])`
+
+proportion of controls, OR with normal GA: `r length(results_all$GAnormal[which(results_all$RCType=='OR' & results_all$type=='control' & results_all$GAnormal=='normal')]) / length(results_all$GAnormal[which(results_all$RCType=='OR' & results_all$type=='control')])`
+
+### Proportion of normal values for IWA
+
+proportion of IWA, SR with normal ANS: `r length(results_all$ANSnormal[which(results_all$RCType=='SR' & results_all$type=='iwa' & results_all$ANSnormal=='normal')]) / length(results_all$ANSnormal[which(results_all$RCType=='SR' & results_all$type=='iwa')])`
+
+proportion of IWA, SR with normal DAT: `r length(results_all$DATnormal[which(results_all$RCType=='SR' & results_all$type=='iwa' & results_all$DATnormal=='normal')]) / length(results_all$DATnormal[which(results_all$RCType=='SR' & results_all$type=='iwa')])`
+
+proportion of IWA, SR with normal GA: `r length(results_all$GAnormal[which(results_all$RCType=='SR' & results_all$type=='iwa' & results_all$GAnormal=='normal')]) / length(results_all$GAnormal[which(results_all$RCType=='SR' & results_all$type=='iwa')])`
+
+proportion of IWA, OR with normal ANS: `r length(results_all$ANSnormal[which(results_all$RCType=='OR' & results_all$type=='iwa' & results_all$ANSnormal=='normal')]) / length(results_all$ANSnormal[which(results_all$RCType=='OR' & results_all$type=='iwa')])`
+
+proportion of IWA, OR with normal DAT: `r length(results_all$DATnormal[which(results_all$RCType=='OR' & results_all$type=='iwa' & results_all$DATnormal=='normal')]) / length(results_all$DATnormal[which(results_all$RCType=='OR' & results_all$type=='iwa')])`
+
+proportion of IWA, OR with normal GA: `r length(results_all$GAnormal[which(results_all$RCType=='OR' & results_all$type=='iwa' & results_all$GAnormal=='normal')]) / length(results_all$GAnormal[which(results_all$RCType=='OR' & results_all$type=='iwa')])`
+
+# Differences in parameter estimates between SR and OR
+
+We estimated parameters for SR and OR separately, which is an error -- in the paper, this will have to be fixed. However, considerable differences across many participants only show up in the estimates for the goal activation parameter, see the following table. This should be mentioned in the discussion.
+
+```{r}
+param_differences <- abs(results_SR[c('GA', 'DAT', 'ANS')] - results_OR[c('GA', 'DAT', 'ANS')])
+summary(param_differences)
+```

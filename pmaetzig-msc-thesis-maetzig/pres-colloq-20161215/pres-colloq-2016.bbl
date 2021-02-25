@@ -1,0 +1,109 @@
+\begin{thebibliography}{}
+
+\bibitem [\protect \citeauthoryear {%
+Engelmann%
+, Vasishth%
+, Engbert%
+\BCBL {}\ \BBA {} Kliegl%
+}{%
+Engelmann%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2013}}%
+}]{%
+Engelmann2013}
+\APACinsertmetastar {%
+Engelmann2013}%
+\begin{APACrefauthors}%
+Engelmann, F.%
+, Vasishth, S.%
+, Engbert, R.%
+\BCBL {}\ \BBA {} Kliegl, R.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2013}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {A Framework for Modeling the Interaction of Syntactic
+  Processing and Eye Movement Control} {A framework for modeling the
+  interaction of syntactic processing and eye movement control}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Topics in Cognitive Science}{5}{3}{452--474}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Hughes%
+}{%
+Hughes%
+}{%
+{\protect \APACyear {1997}}%
+}]{%
+Hughes1997}
+\APACinsertmetastar {%
+Hughes1997}%
+\begin{APACrefauthors}%
+Hughes, R\BPBI I\BPBI G.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{1997}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Models and Representation} {Models and
+  representation}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Philosophy of {Science}}{}{}{325--336}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Lewis%
+\ \BBA {} Vasishth%
+}{%
+Lewis%
+\ \BBA {} Vasishth%
+}{%
+{\protect \APACyear {2005}}%
+}]{%
+LV05}
+\APACinsertmetastar {%
+LV05}%
+\begin{APACrefauthors}%
+Lewis, R\BPBI L.%
+\BCBT {}\ \BBA {} Vasishth, S.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2005}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {An Activation-Based Model of Sentence Processing as
+  Skilled Memory Retrieval} {An activation-based model of sentence processing
+  as skilled memory retrieval}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Cognitive Science}{29}{3}{375--419}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Roberts%
+\ \BBA {} Pashler%
+}{%
+Roberts%
+\ \BBA {} Pashler%
+}{%
+{\protect \APACyear {2000}}%
+}]{%
+RobertsPashler2000}
+\APACinsertmetastar {%
+RobertsPashler2000}%
+\begin{APACrefauthors}%
+Roberts, S.%
+\BCBT {}\ \BBA {} Pashler, H.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2000}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {How persuasive is a good fit?} {How persuasive is a good
+  fit?}{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Psychological Review}{107}{2}{358--367}.
+\PrintBackRefs{\CurrentBib}
+
+\end{thebibliography}

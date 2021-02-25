@@ -1,0 +1,373 @@
+---
+title: "WMC GA correlations in Caplan et al. (2015)"
+author: "Paul Mätzig"
+date: "8/10/2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,fig.height=8,fig.width=8)
+library(dplyr)
+library(ggplot2)
+#library(plotly)
+#library(plot3D)         ## for 3D scatterplots
+#library(scatterplot3d)  ## for 3D scatterplots
+#library(ggdendro)
+library(factoextra)
+#opts_chunk$set(warning=FALSE,comment=NA,fig.height=8,fig.width=8)
+
+```
+
+```{r loaddata,echo=FALSE}
+model_data_SR <- read.csv('../data/response_accuracies_GG_SR_2017016_1736.csv', header=TRUE)
+#model_data_SR <- subset(model_data_SR, model_data_SR$DAT == 0.05 & model_data_SR$ANS == 0.15)
+model_data_OR <- read.csv('../data/response_accuracies_GG_OR_2017018_1827.csv', header=TRUE)
+#model_data_OR <- subset(model_data_OR, model_data_OR$DAT == 0.05 & model_data_OR$ANS == 0.15)
+
+caplan_data <- read.table('../data/CaplanEtAl_2015_data.txt', header=TRUE)
+caplan_data$sent <- as.character(caplan_data$sent)
+
+caplan_data_SR <- filter(caplan_data, sent=='SS')
+caplan_data_OR <- filter(caplan_data, sent=='SO')
+
+caplan_data_REFL <- read.csv2('../data/CaplanEtAl_2015_reflexives.csv', header=TRUE, stringsAsFactors = FALSE) 
+caplan_data_REFL$sent <- as.character(caplan_data_REFL$sent)
+caplan_data_REFL$acc <- as.numeric(caplan_data_REFL$acc)
+caplan_data_SRREFL <- filter(caplan_data_REFL, sent=='SSREF')
+caplan_data_ORREFL <- filter(caplan_data_REFL, sent=='SOREF')
+
+model_data_REFL <- read.csv('../data/response_accuracies_CAPLAN15_SOREFL_20170526_1533.csv', header=TRUE)
+model_data_SRREFL <- filter(model_data_REFL, condition=='SR-REFL')
+model_data_ORREFL <- filter(model_data_REFL, condition=='OR-REFL')
+
+caplan_wmc_iwa <- read.csv2('../data/wmc-caplan-2015-iwa.csv', stringsAsFactors = FALSE)
+caplan_wmc_iwa$Patt.Comp <- NULL
+caplan_wmc_iwa <- cbind.data.frame(caplan_wmc_iwa[c(1, 2, 3, 4)], caplan_wmc_iwa[9:dim(caplan_wmc_iwa)[2]])
+colnames(caplan_wmc_iwa) <- c('subj', 'group', 'age', 't_since_stroke', 'bdae_score', 'bdae_type', 'fwd', 'cmplx', 'digits_fwd', 'digits_bwd', 'phon_sim_nr', 'phon_sim_r', 'alph', 'sub2', 'wle_short', 'wle_long', 'word', 'sent', 'bells_l', 'bells_r', 'bsmss', 'hand', 'wpm_acc', 'wais_blocks', 'wais_pic', 'wraml2', 'wraml2_ce')
+caplan_wmc_iwa$wpm_acc <- as.numeric(caplan_wmc_iwa$wpm_acc)  ## this introduces NA's, shouldn't be a problem
+#str(caplan_wmc_iwa)
+
+caplan_wmc_controls <- read.csv2('../data/wmc-caplan-2015-controls.csv', stringsAsFactors = FALSE)
+#caplan_wmc_controls$group <- rep('control', dim(caplan_wmc_controls)[1])
+colnames(caplan_wmc_controls) <- c('subj', 'digits_fwd', 'digits_bwd', 'phon_sim_nc', 'phon_sim_r', 'alph', 'sub2', 'wle_short', 'wle_long', 'word', 'sent', 'fwd', 'cmplx')
+
+```
+
+```{r preprocess_sim_data, echo=FALSE}
+caplan_data_SR_acc <- summarise(group_by(caplan_data_SR, subj,item), sum(acc) / n())
+#head(caplan_data_SR_acc)
+#summary(caplan_data_SR_acc)
+#xtabs(~subj+item, caplan_data_SR_acc)
+colnames(caplan_data_SR_acc) <- c('subj', 'item', 'acc')
+caplan_data_SR_acc <- summarise(group_by(caplan_data_SR_acc, subj), sum(acc) / n())
+colnames(caplan_data_SR_acc)<-c('subj', 'acc')
+#summary(caplan_data_SR_acc)
+
+caplan_data_OR_acc <- summarise(group_by(caplan_data_OR, subj,item), sum(acc) / n())
+colnames(caplan_data_OR_acc) <- c('subj', 'item', 'acc')
+#head(caplan_data_OR_acc)
+#summary(caplan_data_OR_acc)
+#xtabs(~subj+item, caplan_data_OR_acc)
+caplan_data_OR_acc <- summarise(group_by(caplan_data_OR_acc, subj), sum(acc) / n())
+colnames(caplan_data_OR_acc)<-c('subj', 'acc')
+#summary(caplan_data_OR_acc)
+
+slots_SR <- matrix(rep(NA, dim(model_data_SR)[1]*dim(caplan_data_SR_acc)[1]), ncol=dim(caplan_data_SR_acc)[1])
+slots_OR <- matrix(rep(NA, dim(model_data_OR)[1]*dim(caplan_data_OR_acc)[1]), ncol=dim(caplan_data_OR_acc)[1])
+
+for (i in 1:length(caplan_data_SR_acc$subj)) {
+  tmp_acc <- caplan_data_SR_acc$acc[i]
+  slots_SR[,i] <- abs(model_data_SR$acc - tmp_acc)
+}
+
+for (i in 1:length(caplan_data_OR_acc$subj)) {
+  tmp_acc <- caplan_data_OR_acc$acc[i]
+  slots_OR[,i] <- abs(model_data_OR$acc - tmp_acc)
+}
+
+colnames(slots_SR) <- as.character(caplan_data_SR_acc$subj)
+colnames(slots_OR) <- as.character(caplan_data_OR_acc$subj)
+
+model_data_SR <- cbind(model_data_SR, slots_SR)
+model_data_OR <- cbind(model_data_OR, slots_OR)
+
+get_min_params <- function(data, subject) {
+  ref <- which(data[c(subject)]==min(data[c(subject)]))
+  params <- data[ref, c("GA", "DAT", "ANS")]
+  return(params)
+}
+
+subjects_SR <- colnames(model_data_SR)[9:dim(model_data_SR)[2]]
+subjects_OR <- colnames(model_data_OR)[9:dim(model_data_OR)[2]]
+
+results_SR <- data.frame()
+for (i in 1:length(subjects_SR)) {
+  tmp <- get_min_params(model_data_SR, subjects_SR[i])
+  tmp$subj <- rep(subjects_SR[i], dim(tmp)[1])
+  results_SR <- rbind(results_SR, tmp, make.row.names=FALSE)
+}
+  
+results_OR <- data.frame()
+for (i in 1:length(subjects_OR)) {
+  tmp <- get_min_params(model_data_OR, subjects_OR[i])
+  tmp$subj <- rep(subjects_OR[i], dim(tmp)[1])
+  results_OR <- rbind(results_OR, tmp, make.row.names=FALSE)
+}
+
+## splitting data by SR/OR condition and by control/IWA group
+results_SR_controls <- results_SR[1:(min(which(results_SR$subj=="54001"))-1), ]
+results_SR_iwa <- results_SR[min(which(results_SR$subj=="54001")):dim(results_SR)[1], ]
+results_OR_controls <- results_OR[1:(min(which(results_OR$subj=="54001"))-1), ]
+results_OR_iwa <- results_OR[min(which(results_OR$subj=="54001")):dim(results_OR)[1], ]
+
+## averaging values for each subject:
+control_subj<-unique(results_SR_controls$subj)
+results_SR_c_mn <- data.frame()
+for(i in control_subj){
+      tmp<-subset(results_SR_controls,subj==i)
+      temp<-data.frame(GA=mean(tmp$GA),DAT=mean(tmp$DAT),ANS=mean(tmp$ANS),subj=i)
+      results_SR_c_mn<-rbind(results_SR_c_mn,
+                        temp,make.row.names=FALSE)
+}
+
+
+control_subj<-unique(results_OR_controls$subj)
+results_OR_c_mn <- data.frame()
+for(i in control_subj){
+      tmp<-subset(results_OR_controls,subj==i)
+      temp<-data.frame(GA=mean(tmp$GA),DAT=mean(tmp$DAT),ANS=mean(tmp$ANS),subj=i)
+      results_OR_c_mn<-rbind(results_OR_c_mn,
+                        temp,make.row.names=FALSE)
+}
+
+iwa_subj<-unique(results_SR_iwa$subj)
+results_SR_i_mn <- data.frame()
+for(i in iwa_subj){
+      tmp<-subset(results_SR_iwa,subj==i)
+      temp<-data.frame(GA=mean(tmp$GA),DAT=mean(tmp$DAT),ANS=mean(tmp$ANS),subj=i)
+      results_SR_i_mn<-rbind(results_SR_i_mn,
+                        temp,make.row.names=FALSE)
+}
+
+iwa_subj<-unique(results_OR_iwa$subj)
+results_OR_i_mn <- data.frame()
+for(i in iwa_subj){
+      tmp<-subset(results_OR_iwa,subj==i)
+      temp<-data.frame(GA=mean(tmp$GA),DAT=mean(tmp$DAT),ANS=mean(tmp$ANS),subj=i)
+      results_OR_i_mn<-rbind(results_OR_i_mn,
+                        temp,make.row.names=FALSE)
+}
+
+results_SR_controls<-results_SR_c_mn
+results_OR_controls<-results_OR_c_mn
+results_SR_iwa<-results_SR_i_mn
+results_OR_iwa<-results_OR_i_mn
+
+## coding subjects as factors
+#results_SR_controls$subj <- as.integer(factor(results_SR_controls$subj))
+#results_OR_controls$subj <- as.integer(factor(results_OR_controls$subj))
+
+#results_SR_iwa$subj <- as.integer(factor(results_SR_iwa$subj))
+#results_OR_iwa$subj <- as.integer(factor(results_OR_iwa$subj))
+
+```
+
+```{r lmm}
+caplan_acc <- summarise(group_by(caplan_data,subj, item), sum(acc) / n())
+m_acc_controls <- glmer(acc ~ sent + (1|subj) + (1|item), family = "binomial", subset(caplan_data, caplan_data$grp=="EC"))
+m_acc_iwa <- glmer(acc ~ sent + (1|subj) + (1|item), family = "binomial", subset(caplan_data, caplan_data$grp!="EC"))
+caplan_controls <- subset(caplan_data, caplan_data$grp=="EC" & caplan_data$seg=="a")
+caplan_iwa <- subset(caplan_data, caplan_data$grp!="EC" & caplan_data$seg=="a")
+
+head(caplan_controls)
+xtabs(~subj+item, caplan_controls)
+# fit a maximal bayesian model, get the range of uncertainty for the variance components
+```
+
+
+```{r preprocess_sim_REFL_data, echo=FALSE}
+caplan_data_SRREFL_acc <- summarise(group_by(caplan_data_SRREFL, subj,item), sum(acc, na.rm=TRUE) / n())
+#head(caplan_data_SRREFL_acc)
+#summary(caplan_data_SRREFL_acc)
+#xtabs(~subj+item, caplan_data_SRREFL_acc)
+colnames(caplan_data_SRREFL_acc) <- c('subj', 'item', 'acc')
+caplan_data_SRREFL_acc <- summarise(group_by(caplan_data_SRREFL_acc, subj), sum(acc) / n())
+colnames(caplan_data_SRREFL_acc)<-c('subj', 'acc')
+#summary(caplan_data_SRREFL_acc)
+
+caplan_data_ORREFL_acc <- summarise(group_by(caplan_data_ORREFL, subj,item), sum(acc, na.rm=TRUE) / n())
+colnames(caplan_data_ORREFL_acc) <- c('subj', 'item', 'acc')
+#head(caplan_data_ORREFL_acc)
+#summary(caplan_data_ORREFL_acc)
+#xtabs(~subj+item, caplan_data_ORREFL_acc)
+caplan_data_ORREFL_acc <- summarise(group_by(caplan_data_ORREFL_acc, subj), sum(acc) / n())
+colnames(caplan_data_ORREFL_acc)<-c('subj', 'acc')
+#summary(caplan_data_ORREFL_acc)
+
+slots_SRREFL <- matrix(rep(NA, dim(model_data_SRREFL)[1]*dim(caplan_data_SRREFL_acc)[1]), ncol=dim(caplan_data_SRREFL_acc)[1])
+slots_ORREFL <- matrix(rep(NA, dim(model_data_ORREFL)[1]*dim(caplan_data_ORREFL_acc)[1]), ncol=dim(caplan_data_ORREFL_acc)[1])
+
+for (i in 1:length(caplan_data_SRREFL_acc$subj)) {
+  tmp_acc <- caplan_data_SRREFL_acc$acc[i]
+  slots_SRREFL[,i] <- abs(model_data_SRREFL$acc_embV - tmp_acc)
+}
+
+for (i in 1:length(caplan_data_ORREFL_acc$subj)) {
+  tmp_acc <- caplan_data_ORREFL_acc$acc[i]
+  slots_ORREFL[,i] <- abs(model_data_ORREFL$acc_embV - tmp_acc)
+}
+
+colnames(slots_SRREFL) <- paste("s", caplan_data_SRREFL_acc$subj, sep = "")
+colnames(slots_ORREFL) <- paste("s", caplan_data_ORREFL_acc$subj, sep = "")
+
+model_data_SRREFL <- cbind(model_data_SRREFL, slots_SRREFL)
+model_data_ORREFL <- cbind(model_data_ORREFL, slots_ORREFL)
+
+get_min_params <- function(data, subject) {
+  ref <- which(data[c(subject)]==min(data[c(subject)]))
+  params <- data[ref, c("GA", "DAT", "ANS")]
+  return(params)
+}
+
+subjects_SRREFL <- colnames(model_data_SRREFL)[12:dim(model_data_SRREFL)[2]]
+subjects_ORREFL <- colnames(model_data_ORREFL)[12:dim(model_data_ORREFL)[2]]
+
+results_SRREFL <- data.frame()
+for (i in 1:length(subjects_SRREFL)) {
+  tmp <- get_min_params(model_data_SRREFL, subjects_SRREFL[i])
+  tmp$subj <- rep(subjects_SRREFL[i], dim(tmp)[1])
+  results_SRREFL <- rbind(results_SRREFL, tmp, make.row.names=FALSE)
+}
+
+#subjects<-unique(results_SRREFL$subj)
+#for(i in 1:length(subjects)){
+#print(dim(subset(results_SRREFL,subj==subjects[i]))[1])
+#}
+  
+results_ORREFL <- data.frame()
+for (i in 1:length(subjects_ORREFL)) {
+  tmp <- get_min_params(model_data_ORREFL, subjects_ORREFL[i])
+  tmp$subj <- rep(subjects_ORREFL[i], dim(tmp)[1])
+  results_ORREFL <- rbind(results_ORREFL, tmp, make.row.names=FALSE)
+}
+
+## splitting data by SRREFL/ORREFL condition and by control/IWA group
+results_SRREFL_controls <- results_SRREFL[1:(min(which(results_SRREFL$subj=="s54001"))-1), ]
+results_SRREFL_iwa <- results_SRREFL[min(which(results_SRREFL$subj=="s54001")):dim(results_SRREFL)[1], ]
+results_ORREFL_controls <- results_ORREFL[1:(min(which(results_ORREFL$subj=="s54001"))-1), ]
+results_ORREFL_iwa <- results_ORREFL[min(which(results_ORREFL$subj=="s54001")):dim(results_ORREFL)[1], ]
+
+## averaging values for each subject:
+control_subj<-unique(results_SRREFL_controls$subj)
+results_SRREFL_c_mn <- data.frame()
+for(i in control_subj){
+      tmp<-subset(results_SRREFL_controls,subj==i)
+      temp<-data.frame(GA=mean(tmp$GA),DAT=mean(tmp$DAT),ANS=mean(tmp$ANS),subj=i)
+      results_SRREFL_c_mn<-rbind(results_SRREFL_c_mn,
+                        temp,make.row.names=FALSE)
+}
+
+control_subj<-unique(results_ORREFL_controls$subj)
+results_ORREFL_c_mn <- data.frame()
+for(i in control_subj){
+      tmp<-subset(results_ORREFL_controls,subj==i)
+      temp<-data.frame(GA=mean(tmp$GA),DAT=mean(tmp$DAT),ANS=mean(tmp$ANS),subj=i)
+      results_ORREFL_c_mn<-rbind(results_ORREFL_c_mn,
+                        temp,make.row.names=FALSE)
+}
+
+iwa_subj<-unique(results_SRREFL_iwa$subj)
+results_SRREFL_i_mn <- data.frame()
+for(i in iwa_subj){
+      tmp<-subset(results_SRREFL_iwa,subj==i)
+      temp<-data.frame(GA=mean(tmp$GA),DAT=mean(tmp$DAT),ANS=mean(tmp$ANS),subj=i)
+      results_SRREFL_i_mn<-rbind(results_SRREFL_i_mn,
+                        temp,make.row.names=FALSE)
+}
+
+iwa_subj<-unique(results_ORREFL_iwa$subj)
+results_ORREFL_i_mn <- data.frame()
+for(i in iwa_subj){
+      tmp<-subset(results_ORREFL_iwa,subj==i)
+      temp<-data.frame(GA=mean(tmp$GA),DAT=mean(tmp$DAT),ANS=mean(tmp$ANS),subj=i)
+      results_ORREFL_i_mn<-rbind(results_ORREFL_i_mn,
+                        temp,make.row.names=FALSE)
+}
+
+results_SRREFL_controls<-results_SRREFL_c_mn
+results_ORREFL_controls<-results_ORREFL_c_mn
+results_SRREFL_iwa<-results_SRREFL_i_mn
+results_ORREFL_iwa<-results_ORREFL_i_mn
+
+```
+
+
+```{r preprocess_wmc_data, echo=FALSE}
+# some subj missing in the sim acc data; cut these from wmc data frame
+subj_iwa_final <- intersect(results_SR_iwa$subj, caplan_wmc_iwa$subj)
+del_subj_caplan_wmc_iwa <- subset(caplan_wmc_iwa, ! (caplan_wmc_iwa$subj %in% subj_iwa_final))
+caplan_wmc_iwa <- subset(caplan_wmc_iwa, caplan_wmc_iwa$subj %in% subj_iwa_final)
+
+# same for controls
+caplan_wmc_controls <- caplan_wmc_controls[1:46, ]  ## 46 controls, deleted rows with avg etc
+subj_controls_final <- intersect(results_SR_controls$subj, caplan_wmc_controls$subj)
+del_subj_caplan_wmc_controls <- subset(caplan_wmc_controls, ! (caplan_wmc_controls$subj %in% subj_controls_final))
+
+# sanity check: is the order of subj the same?
+(FALSE %in% (caplan_wmc_iwa$subj == results_SR_iwa$subj))
+(FALSE %in% (caplan_wmc_iwa$subj == results_OR_iwa$subj))
+(FALSE %in% (caplan_wmc_controls$subj == results_SR_controls$subj))
+(FALSE %in% (caplan_wmc_controls$subj == results_OR_controls$subj))
+
+# add GA estimates from simulations as variable to wmc data set
+caplan_wmc_iwa$GA_OR <- results_OR_iwa$GA
+caplan_wmc_iwa$GA_SR <- results_SR_iwa$GA
+caplan_wmc_iwa$GA_ORREFL <- results_ORREFL_iwa$GA
+caplan_wmc_iwa$GA_SRREFL <- results_SRREFL_iwa$GA
+caplan_wmc_controls$GA_OR <- results_OR_controls$GA
+caplan_wmc_controls$GA_SR <- results_SR_controls$GA
+caplan_wmc_controls$GA_ORREFL <- results_ORREFL_controls$GA
+caplan_wmc_controls$GA_SRREFL <- results_SRREFL_controls$GA
+
+```
+
+The last two rows of the correlation matrix (matrices) show correlations between the goal activation estimates for a task. 
+
+```{r analyse_cor}
+cor_wmc_ga_controls <- data.frame(cor(caplan_wmc_controls[2:dim(caplan_wmc_controls)[2]], use = "pairwise.complete.obs"))
+cor_wmc_ga_NA_controls <- data.frame(cor(caplan_wmc_controls[2:dim(caplan_wmc_controls)[2]]))
+
+par(mfrow=c(2,2))
+plot(caplan_wmc_controls$digits_fwd ~ results_OR_controls$GA)
+plot(caplan_wmc_controls$phon_sim_nr ~ results_OR_controls$GA)
+plot(caplan_wmc_controls$alph ~ results_OR_controls$GA)
+plot(caplan_wmc_controls$wle_short ~ results_OR_controls$GA)
+
+par(mfrow=c(2,2))
+plot(caplan_wmc_controls$digits_fwd ~ results_SR_controls$GA)
+plot(caplan_wmc_controls$phon_sim_nr ~ results_SR_controls$GA)
+plot(caplan_wmc_controls$alph ~ results_SR_controls$GA)
+plot(caplan_wmc_controls$wle_short ~ results_SR_controls$GA)
+
+cor_wmc_ga_iwa <- data.frame(cor(caplan_wmc_iwa[7:dim(caplan_wmc_iwa)[2]], use = "pairwise.complete.obs"))
+cor_wmc_ga_NA_iwa <- data.frame(cor(caplan_wmc_iwa[7:dim(caplan_wmc_iwa)[2]]))
+
+par(mfrow=c(2,2))
+plot(caplan_wmc_iwa$digits_fwd ~ results_OR_iwa$GA)
+plot(caplan_wmc_iwa$phon_sim_nr ~ results_OR_iwa$GA)
+plot(caplan_wmc_iwa$alph ~ results_OR_iwa$GA)
+plot(caplan_wmc_iwa$wle_short ~ results_OR_iwa$GA)
+
+par(mfrow=c(2,2))
+plot(caplan_wmc_iwa$digits_fwd ~ results_SR_iwa$GA)
+plot(caplan_wmc_iwa$phon_sim_nr ~ results_SR_iwa$GA)
+plot(caplan_wmc_iwa$alph ~ results_SR_iwa$GA)
+plot(caplan_wmc_iwa$wle_short ~ results_SR_iwa$GA)
+```
+
+## Looking at subgroups of IWA
+
+```{r}
+
+
+```

@@ -1,0 +1,4 @@
+CAPLAN15-FULL 1 output/../paramsearch/CAPLAN15-FULL-20170821-0112/1-fixations.txt "(GA 0.3 DAT 0.05 ANS 0.15)"
+CAPLAN15-FULL 2 output/../paramsearch/CAPLAN15-FULL-20170821-0112/2-fixations.txt "(GA 1.0 DAT 0.05 ANS 0.15)"
+CAPLAN15-FULL 3 output/../paramsearch/CAPLAN15-FULL-20170821-0112/3-fixations.txt "(GA 0.3 DAT 0.1 ANS 0.15)"
+CAPLAN15-FULL 4 output/../paramsearch/CAPLAN15-FULL-20170821-0112/4-fixations.txt "(GA 1.0 DAT 0.1 ANS 0.15)"

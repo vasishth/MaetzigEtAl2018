@@ -1,0 +1,43 @@
+\documentclass{scrbook}
+\linespread{1.25}
+
+%% References
+\usepackage{apacite}
+
+%% Mathematics
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+
+%% including pdfs as whole pages (if necessary)
+\usepackage{pdfpages}
+
+%% to-do-note management
+\usepackage{todonotes}
+
+%% compilation of single sub-documents of thesis
+\usepackage{subfiles}
+
+%% section referencing
+\newcommand{\secref}[1]{
+  section \ref{#1}
+}
+
+\title{Computational modelling of sentence processing in aphasia}
+ 
+\author{Paul M\"{a}tzig}
+
+\begin{document}
+
+\maketitle
+
+% INTRODUCTION 
+\subfile{intro}
+
+% LITERATURE REVIEW
+\subfile{litreview}
+
+%\bibliographystyle{apacite}
+%\bibliography{maetzigetal_iccm17}
+
+\end{document}

@@ -1,0 +1,42 @@
+# Plan for next ~week
+
+### 1. Modelling
+
+- see `exp-predictions-2016.lisp` for an example of tested param
+  combinations
+- rerun all of these sets (7 total) >> either:
+    - use a loop in `exp-predictions-2016.lisp` and simply run each
+      `search-param-space-em` 4 times (need to think about output dir;
+      but I think it should just be put into 4 different dirs in `paramsearch/`)
+    - define a wrapper based on `search-param-space-subjects-em`, but without
+      the automatic WMC calculation
+
+
+### 2. Analysis
+
+- for each parameter value combination, there should now exist 4 files called
+  `j-fixations.txt` in the corresponding dir in `paramsearch/`:
+    - in R, read them in iteratively and use `em2` to calculate reading measures
+      for each set
+    - once done, this procedure can be repeated easily on all the other sets
+    - use some of the helper functions and code bits from Felix' analysis script
+      (which doesn't work)
+
+### 3. Q accuracy modelling
+
+- would be good to have finished 1 & 2, so that one can make a sensible selection
+  of parameter combinations where one is fairly sure that the effect is not only
+  noise; and to save time
+- i.e.: for each parameter value combination & iteration, result is one data frame with reading measures
+- calculate regionmeans and SE on these df (`regionmeans.R` should be usable); for SR and OR each
+- gather means and SEs for MV/EmbV for SR/OR separately in one dataframe - do this for each paramsearch dir & model checking run
+- from this table: generate plot (as in photo)
+
+# Meeting 2016-10-12
+
+### Tasks
+
+- of the simulations, send Shravan one data frame (of fixations? reading measures?
+- send one df for two settings of :ga, keeping other parameters the same
+
+

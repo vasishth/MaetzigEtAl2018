@@ -1,0 +1,5 @@
+,simset,condition,GA,sentCount,corrCountEmbV,corrCountPron,acc_embV,acc_pron
+0,1,OR-PRON,0.5,200.0,100.0,10.0,1.0,0.1
+1,1,SR-PRON,0.5,200.0,100.0,0.0,1.0,0.0
+2,2,OR-PRON,1.0,200.0,100.0,12.0,1.0,0.12
+3,2,SR-PRON,1.0,200.0,100.0,0.0,1.0,0.0
