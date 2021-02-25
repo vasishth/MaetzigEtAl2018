@@ -1,5 +1,0 @@
-exp fullname cond sent pos roi condroi data FPRT TFT FFD RRT RPD fp_reg skip reread ACC
-GG-EXP1 "Grodner & Gibson (2004) Exp. 1" SUBJECT-REL *GG-SR* 4 EMBEDDED-VERB subject-rel:embedded-verb 344.0 NIL NIL NIL NIL NIL NIL NIL NIL NIL
-GG-EXP1 "Grodner & Gibson (2004) Exp. 1" SUBJECT-REL *GG-SR* 10 MAIN-VERB subject-rel:main-verb 381.0 NIL NIL NIL NIL NIL NIL NIL NIL NIL
-GG-EXP1 "Grodner & Gibson (2004) Exp. 1" OBJECT-REL *GG-OR* 6 EMBEDDED-VERB object-rel:embedded-verb 399.0 NIL NIL NIL NIL NIL NIL NIL NIL NIL
-GG-EXP1 "Grodner & Gibson (2004) Exp. 1" OBJECT-REL *GG-OR* 10 MAIN-VERB object-rel:main-verb 383.0 NIL NIL NIL NIL NIL NIL NIL NIL NIL
